@@ -7,7 +7,7 @@ This repository contains my complete Data Engineering learning journey, includin
 - Interview Questions
 
 ## Tech Stack
-- Python
+- Python  
 - SQL
 - PySpark
 - Databricks
