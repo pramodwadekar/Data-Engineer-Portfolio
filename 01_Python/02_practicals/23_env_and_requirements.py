@@ -11,3 +11,11 @@ def main():
 if __name__ == "__main__":
     main()
 
+
+""" 
+requirements.txt (ADD THIS FILE)
+
+pandas
+pyarrow 
+
+"""
