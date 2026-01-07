@@ -57,6 +57,7 @@ df[df["amount"] > 1000]
 Data Engineers must handle nulls explicitly.
 
 df.dropna()
+
 df.fillna(0)
 
 **d) Aggregations (GroupBy)**
@@ -78,7 +79,9 @@ Pandas is often used to validate incoming data.
 **Examples:**
 
 df.isnull().sum()
+
 df.dtypes
+
 df.shape
 
 
