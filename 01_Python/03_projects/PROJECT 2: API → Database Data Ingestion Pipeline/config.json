@@ -1,0 +1,6 @@
+{
+  "api_url": "https://jsonplaceholder.typicode.com/posts",
+  "database_path": "data/api_data.db",
+  "table_name": "posts",
+  "request_timeout": 10
+}
