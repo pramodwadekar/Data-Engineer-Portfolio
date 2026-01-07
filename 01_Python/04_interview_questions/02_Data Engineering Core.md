@@ -55,3 +55,18 @@ This avoids silent data corruption.
 - Structured analytics → SQL
 - Big data → Spark
 
+## 5. How do you handle schema changes in incoming data using Python?
+
+### Answer:
+By:
+
+- Validating required columns explicitly
+
+- Ignoring extra columns if safe
+
+- Failing the pipeline if mandatory columns are missing
+
+- Logging schema changes for investigation
+
+Schema validation prevents unexpected pipeline behavior.
+
