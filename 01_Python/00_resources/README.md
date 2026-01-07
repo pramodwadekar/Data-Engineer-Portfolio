@@ -9,7 +9,7 @@ These resources focus on **data processing, ETL pipelines, pandas, performance, 
 
 ### YouTube
 - Corey Schafer – Python Core Concepts  
-  https://www.youtube.com/@CoreySchafer
+  https://www.youtube.com/@coreyms
 - Krish Naik – Python for Data Engineering  
   https://www.youtube.com/@krishnaik06
 
