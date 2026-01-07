@@ -38,12 +38,15 @@ df = pd.read_csv("raw/sales.csv")
 **a) Reading and Writing Data**
 
 pd.read_csv("data.csv")
+
 pd.read_json("data.json")
+
 pd.read_parquet("data.parquet")
 
 **Writing data:**
 
 df.to_csv("output.csv", index=False)
+
 df.to_parquet("output.parquet")
 
 **b) Filtering Data**
