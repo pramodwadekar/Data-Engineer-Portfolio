@@ -1,0 +1,6 @@
+order_id,category,amount,order_date
+1,Electronics,1200,2024-01-01
+2,Clothing,800,2024-01-01
+3,Electronics,1500,2024-01-02
+4,Furniture,,2024-01-02
+5,Clothing,700,2024-01-03
