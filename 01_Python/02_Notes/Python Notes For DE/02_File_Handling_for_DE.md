@@ -30,7 +30,7 @@ File handling is used in:
 - Backup and recovery workflows
 
 Example:
-```python
+
 df = pd.read_csv("raw/customers.csv")
 
 ---
