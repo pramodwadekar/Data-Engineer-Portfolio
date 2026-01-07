@@ -29,7 +29,7 @@ File handling is used in:
 - Exchanging data between systems
 - Backup and recovery workflows
 
-Example:
+**Example:**
 
 df = pd.read_csv("raw/customers.csv")
 
@@ -54,9 +54,9 @@ df = pd.read_csv("raw/customers.csv")
 
    Structured, row-based text format.
 
-   Read CSV:
+   **Read CSV:**
    pd.read_csv("data/sales.csv")
-   Write CSV:
+   **Write CSV:**
    df.to_csv("output/sales_clean.csv", index=False)
 ---
 
@@ -74,14 +74,14 @@ df = pd.read_csv("raw/customers.csv")
 - Nested structures increase complexity
 - Larger file size compared to Parquet
 
-b) JSON (JavaScript Object Notation)
+**b) JSON (JavaScript Object Notation)**
    Semi-structured, key-value based format.
 
-   Read JSON:
+   **Read JSON:**
    import json
    data = json.load(open("data/events.json"))
 
-   Using pandas:
+   **Using pandas:**
    pd.read_json("data/events.json")
 
 ---
@@ -104,16 +104,16 @@ b) JSON (JavaScript Object Notation)
 ---
    Columnar, compressed, analytics-optimized format.
 
-   Read Parquet:
+   **Read Parquet:**
    pd.read_parquet("data/sales.parquet")
 
-   Write Parquet:
+   **Write Parquet:**
    df.to_parquet("output/sales.parquet")
 
 
 ## 5. Reading Files in Python (DE Perspective)
 
-   Common methods:
+   **Common methods:**
    pd.read_csv("file.csv")
    pd.read_json("file.json")
    pd.read_parquet("file.parquet")
@@ -123,20 +123,20 @@ b) JSON (JavaScript Object Notation)
 
 ## 6. Writing Files in Python
 
-   Typical write operations:
+  **Typical write operations:**
    df.to_csv("output.csv", index=False)
    df.to_parquet("output.parquet")
 
 
 ## 5. Reading Files in Python (DE Perspective)
 
-Common approaches:
+**Common approaches:**
 
-- CSV: `pandas.read_csv()`
-- JSON: `json.load()` or `pandas.read_json()`
-- Parquet: `pandas.read_parquet()`
+- **CSV:** `pandas.read_csv()`
+- **JSON:** `json.load()` or `pandas.read_json()`
+- **Parquet:** `pandas.read_parquet()`
 
-Data Engineers must always:
+**Data Engineers must always:**
 - Validate schema
 - Handle missing files
 - Check data quality
@@ -145,16 +145,16 @@ Data Engineers must always:
 
 ## 6. Writing Files in Python
 
-Typical methods:
+**Typical methods:**
 - `DataFrame.to_csv()`
 - `DataFrame.to_parquet()`
 
-Best practice:
+**Best practice:**
 - Avoid overwriting critical files
 - Use versioned or timestamped outputs
 - Store outputs in standardized locations
 
-Typical write operations:
+**Typical write operations:**
   df.to_csv("output.csv", index=False)
   df.to_parquet("output.parquet")
 
@@ -169,7 +169,7 @@ Typical write operations:
 - Prefer Parquet over CSV for analytics
 - Use Spark for large-scale file processing
 
-Example (basic file existence check):
+**Example (basic file existence check):**
   import os
   os.path.exists("data/input.csv")
 
@@ -183,7 +183,7 @@ Example (basic file existence check):
 - Not validating input data
 - Using CSV for large analytical workloads
 
-Example of what not to do:
+**Example of what not to do:**
   pd.read_csv("very_large_file.csv")  # may crash memory
 
 
@@ -213,7 +213,7 @@ Interviewers expect Data Engineers to:
 - Know limitations of Python file handling
 - Explain how to handle missing or corrupt files
 
-Typical interview question:
+**Typical interview question:**
 
 ❓ *Why is Parquet preferred over CSV in Data Engineering?*  
 ✅ Parquet is columnar, compressed, and optimized for analytics workloads.
