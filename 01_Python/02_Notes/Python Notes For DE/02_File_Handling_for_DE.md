@@ -56,6 +56,7 @@ df = pd.read_csv("raw/customers.csv")
 
    **Read CSV:**
    pd.read_csv("data/sales.csv")
+  
    **Write CSV:**
    df.to_csv("output/sales_clean.csv", index=False)
 ---
@@ -78,7 +79,9 @@ df = pd.read_csv("raw/customers.csv")
    Semi-structured, key-value based format.
 
    **Read JSON:**
+   
    import json
+   
    data = json.load(open("data/events.json"))
 
    **Using pandas:**
