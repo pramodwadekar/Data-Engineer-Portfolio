@@ -1,0 +1,5 @@
+{
+  "input_path": "data/raw/sales.csv",
+  "output_path": "data/processed/sales_summary.csv",
+  "min_amount": 500
+}
