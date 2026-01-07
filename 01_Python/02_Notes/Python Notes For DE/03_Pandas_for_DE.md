@@ -161,13 +161,22 @@ If data does not fit in memory → use Spark
 **Typical interview question:**
 
 ❓ Why is pandas not suitable for big data?
+
 ✅ Pandas runs on a single machine and is memory-bound.
 
 **Key Takeaway**
 
 Pandas is a support tool in Data Engineering.
+
 It is excellent for validation and small-scale processing,
+
 but production pipelines rely on Spark for scalability.
+
+
+---
+
+
+
 
 
 
