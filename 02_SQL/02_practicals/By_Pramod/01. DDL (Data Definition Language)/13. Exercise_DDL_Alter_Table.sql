@@ -12,8 +12,3 @@ alter table Product add Color varchar(10);
 -- Exercise DDL Alter Add Column Constraint
 alter table Product add Review varchar(10) check (Review in ('Bad', 'Good', 'Excellent'));
 
--- Exercise DDL Alter DropTable Vendoroffering 
-DROP TABLE IF EXISTS VendorOffering;
-
--- Exercise DDL DropTable Product 
-drop table Product CASCAD
