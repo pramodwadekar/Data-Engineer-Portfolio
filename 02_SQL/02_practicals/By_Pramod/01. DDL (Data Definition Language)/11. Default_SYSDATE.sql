@@ -1,0 +1,5 @@
+CREATE TABLE Student (
+  StudentId INTEGER,
+  Fname VARCHAR(10),
+  DOJ DATE DEFAULT SYSDATE
+);
