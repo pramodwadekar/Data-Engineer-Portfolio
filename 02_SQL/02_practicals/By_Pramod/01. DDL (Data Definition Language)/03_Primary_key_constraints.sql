@@ -1,0 +1,4 @@
+1. CREATE TABLE Student(
+2. StudentId INTEGER CONSTRAINT Student_const_pk PRIMARY KEY,
+3. StudentName VARCHAR(25) NOT NULL,
+4. DOJ DATE);
