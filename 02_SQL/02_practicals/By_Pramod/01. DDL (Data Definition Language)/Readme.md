@@ -6,8 +6,12 @@ DDL stands for Data Definition Language, which is actually a set of commands use
 
 DDL includes the following commands:
 
-CREATE
-ALTER
-DROP
-TRUNCATE
-RENAME
+- CREATE
+  
+- ALTER
+
+- DROP
+
+- TRUNCATE
+
+- RENAME
