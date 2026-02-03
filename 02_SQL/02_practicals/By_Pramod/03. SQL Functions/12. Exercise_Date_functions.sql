@@ -1,0 +1,11 @@
+-- 1: Exercise Functions Months Lapsed
+SELECT INVOICEID, PRODUCTID, 
+       ROUND(MONTHS_BETWEEN(CURRENT_DATE, PURCHASEDATE)) AS "NOOFMONTHS" 
+FROM INVOICE 
+WHERE PRODUCTID = 'P105';
+
+-- 2: Exercise Functions Date
+SELECT INVOICEID AS "InvoiceId", 
+       PURCHASEDATE AS "PurchaseDate", 
+       ADD_MONTHS(PURCHASEDATE, 2) AS "ExchangeValidityDate" 
+FROM INVOICE;
