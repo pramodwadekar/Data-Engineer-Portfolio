@@ -60,7 +60,7 @@ Example document:
 
 
 
-**🔹 Basic NoSQL (MongoDB) Commands**
+##🔹 Basic NoSQL (MongoDB) Commands
 
 // Show databases
 show dbs
