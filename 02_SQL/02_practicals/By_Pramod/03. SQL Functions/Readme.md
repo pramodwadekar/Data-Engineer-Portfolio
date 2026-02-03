@@ -7,8 +7,8 @@ Some commonly used categories of SQL functions include:
 - Numeric functions
 - Character functions
 - Conversion functions
-- Date functions
 - Aggregate functions
+- Date functions
 - Miscellaneous functions
 
 Functions are categorized into two types:
