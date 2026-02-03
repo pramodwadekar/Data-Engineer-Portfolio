@@ -49,18 +49,18 @@ Unlike traditional SQL databases, NoSQL databases are **schema-flexible**, **hor
 - Collections are like tables, documents are like rows  
 - Very flexible and easy to scale  
 
-Example document:
-```json
+**Example document:**
+json
 {
   "EmpID": 101,
   "EmpName": "Rahul",
   "Salary": 50000,
   "Skills": ["Python", "SQL", "Spark"]
-}```
+}
 
 
 
-##🔹 Basic NoSQL (MongoDB) Commands
+**🔹 Basic NoSQL (MongoDB) Commands**
 
 // Show databases
 show dbs
