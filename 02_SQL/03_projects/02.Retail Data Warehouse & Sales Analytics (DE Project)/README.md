@@ -80,14 +80,25 @@ Pramod Wadekar
 🏗️ Folder Structure
 retail-data-warehouse-sql/
 │
+
 ├── README.md
+
 ├── 01_create_database.sql
+
 ├── 02_create_source_tables.sql
+
 ├── 03_create_dimension_tables.sql
+
 ├── 04_create_fact_tables.sql
+
 ├── 05_load_dimensions.sql
+
 ├── 06_load_facts.sql
+
 ├── 07_indexes.sql
+
 ├── 08_views.sql
+
 ├── 09_data_quality_checks.sql
+
 └── 10_reports.sql
