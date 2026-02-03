@@ -56,7 +56,7 @@ Example document:
   "EmpName": "Rahul",
   "Salary": 50000,
   "Skills": ["Python", "SQL", "Spark"]
-}
+}```
 
 
 
