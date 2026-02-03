@@ -26,6 +26,27 @@ This project is suitable for:
 
 ---
 
+## 🧩 Why This Project?
+
+In real-world applications, almost every system (e-commerce, billing, ERP, CRM) needs a well-designed relational database to store and manage data such as customers, products, orders, and payments.
+
+This project simulates a **real Online Shop backend database** and is designed to:
+
+- Practice **real-world database design**
+- Understand **how different tables are related**
+- Learn **how business data flows** (Customer → Order → Order Items → Payment)
+- Apply **SQL concepts in a practical scenario** instead of only theory
+- Build a **portfolio-ready SQL project** that can be explained in interviews
+
+Instead of writing random queries, this project shows how SQL is used to:
+- Store business data safely
+- Maintain data integrity using constraints
+- Fetch meaningful reports using joins and aggregations
+- Automate tasks using procedures and triggers
+
+---
+
+
 ## 🗄️ Database Used
 
 - MySQL (You can adapt it to PostgreSQL / SQL Server with small changes)
@@ -100,6 +121,31 @@ online-shop-sql-project/
 - Payments
 
 ---
+
+## 🏗️ Database Design Explanation
+
+The database is designed using a **relational model**:
+
+- `Customers` stores customer details  
+- `Products` stores product information  
+- `Categories` groups products  
+- `Orders` stores each order placed by a customer  
+- `OrderItems` stores which products are inside each order (many-to-many relationship)  
+- `Payments` stores payment details for orders  
+- `Employees` stores staff who handle orders  
+
+Relationships:
+- One customer can place many orders
+- One order can have many products (via OrderItems)
+- One product belongs to one category
+- One employee can handle many orders
+
+This design follows:
+- **Normalization principles**
+- **Primary key & foreign key relationships**
+- **Proper separation of concerns between entities**
+
+--- 
 
 ## ✨ Features Covered
 
