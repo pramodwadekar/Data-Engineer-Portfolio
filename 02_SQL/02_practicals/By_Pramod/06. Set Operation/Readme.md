@@ -26,3 +26,25 @@ FROM table1
 <SET OPERATION>
 SELECT column1, column2, ...
 FROM table2;
+
+
+## 🔹 Examples
+-- UNION: Employees from two departments (no duplicates)
+SELECT EName, Dept FROM Employee WHERE Dept = 'ETA'
+UNION
+SELECT EName, Dept FROM Employee WHERE Dept = 'ICP';
+
+-- UNION ALL: Employees from two departments (with duplicates)
+SELECT EName, Dept FROM Employee WHERE Dept = 'ETA'
+UNION ALL
+SELECT EName, Dept FROM Employee WHERE Dept = 'ICP';
+
+-- INTERSECT: Employees common to both queries
+SELECT EName, Dept FROM Employee WHERE Dept = 'ETA'
+INTERSECT
+SELECT EName, Dept FROM Employee WHERE Dept = 'ICP';
+
+-- EXCEPT / MINUS: Employees in ETA but not in ICP
+SELECT EName, Dept FROM Employee WHERE Dept = 'ETA'
+EXCEPT
+SELECT EName, Dept FROM Employee WHERE Dept = 'ICP';
