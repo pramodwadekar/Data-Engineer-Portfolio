@@ -1,0 +1,133 @@
+Here’s the organized set:
+
+✅ Key-Value Store Example
+"Cust001": { 
+  "items": [ 
+    { "product": "HP Laptop", "qty": 1 }, 
+    { "product": "Sandisk 16GB", "qty": 3 } 
+  ] 
+}
+
+"Cust002": { 
+  "items": [ 
+    { "product": "Canon Printer", "qty": 2 } 
+  ] 
+}
+
+"Cust003": { 
+  "items": [ 
+    { "product": "Canon Printer", "qty": 1 }, 
+    { "product": "Bajaj Microwave", "qty": 1 } 
+  ] 
+}
+
+"Cust004": { 
+  "items": [ 
+    { "product": "Philips LED 32 inch TV", "qty": 2 } 
+  ] 
+}
+
+
+
+✅ Column Family Store Example
+Row Key: 1234
+Column Family 1:
+  name        → Mark
+  gender      → Male
+  DOB         → 14 May 1984
+  Nationality → Indian
+
+Row Key: 5678
+Column Family 1:
+  name        → Steve
+  gender      → Male
+  DOB         → 24-Feb-1955
+
+Column Family 2:
+  department  → ETA
+  designation → PTA
+  DOJ         → 1-Jan-1976
+
+Column Family 2:
+  department  → ETA
+  designation → STA
+  DOJ         → 4-Feb-2004
+
+
+
+✅ Document-Oriented Database Example (MongoDB style)
+{
+  "111": { 
+    "category": "book", 
+    "price": 250, 
+    "author": "Herbert Schildt", 
+    "title": "Java Programming" 
+  },
+  "222": { 
+    "category": "tv", 
+    "price": 20000, 
+    "screensize": "40 inch", 
+    "display": "LCD" 
+  },
+  "333": { 
+    "category": "mobile", 
+    "os": "Android", 
+    "screensize": "5 inch", 
+    "camera": "13MP", 
+    "price": 4000 
+  }
+}
+
+
+
+✅ Graph Database Example (Neo4j style)
+CREATE (u1:User {userid:1, username:"Anu"});
+CREATE (u2:User {userid:2, username:"Priya"});
+CREATE (u3:User {userid:3, username:"Raj"});
+CREATE (u4:User {userid:4, username:"Sneha"});
+CREATE (u5:User {userid:5, username:"Vinay"});
+
+CREATE (u1)-[:FOLLOWS]->(u3);
+CREATE (u1)-[:FOLLOWS]->(u2);
+CREATE (u2)-[:FOLLOWS]->(u4);
+CREATE (u5)-[:FOLLOWS]->(u1);
+CREATE (u5)-[:FOLLOWS]->(u3);
+CREATE (u4)-[:FOLLOWS]->(u2);
+CREATE (u2)-[:FOLLOWS]->(u3);
+
+
+
+✅ SQL vs NoSQL Schema Illustration
+SQL Table (Rigid Schema)
+CREATE TABLE Users (
+  FirstName VARCHAR(50),
+  LastName VARCHAR(50),
+  Email VARCHAR(100),
+  Gender VARCHAR(10),
+  Landline VARCHAR(15),
+  Mobile VARCHAR(15)
+);
+
+
+NoSQL Document (Flexible Schema)
+{
+  "UserName": { "firstName": "James" },
+  "Email": "james@abc.com",
+  "Gender": "Male",
+  "ContactNo": { "landLine": "123", "mobile": "456" }
+}
+
+{
+  "UserName": { "firstName": "Ethan", "lastName": "McCarty" },
+  "Email": "ethan@abc.com",
+  "ContactNo": { "mobile": "789" }
+}
+
+
+
+📌 Key Insight:
+- SQL → rigid schema, centralized, vertical scaling.
+- NoSQL → flexible schema, distributed, horizontal scaling.
+- Different NoSQL types (Key-Value, Column Family, Document, Graph) are suited for different workloads.
+
+Would you like me to merge all three PDFs (Transactions, OLTP/Locking, NoSQL) into a single consolidated cheat sheet so you have one master reference for SQL + NoSQL concepts side by side?
