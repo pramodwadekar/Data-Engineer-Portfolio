@@ -36,18 +36,31 @@ This project is suitable for:
 
 online-shop-sql-project/
 │
+
 ├── README.md
+
 ├── 01_create_database.sql
+
 ├── 02_create_tables.sql
+
 ├── 03_constraints_indexes.sql
+
 ├── 04_insert_sample_data.sql
+
 ├── 05_basic_queries.sql
+
 ├── 06_joins_queries.sql
+
 ├── 07_aggregate_queries.sql
+
 ├── 08_subqueries.sql
+
 ├── 09_views.sql
+
 ├── 10_procedures.sql
+
 ├── 11_triggers.sql
+
 └── 12_reports.sql
 
 
