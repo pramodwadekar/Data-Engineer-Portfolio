@@ -1,10 +1,13 @@
 ## Retail Sales Analytics using SQL
+# Problem Statement
 
-The company wants to analyze retail sales data to:
-- Track daily, monthly, yearly revenue
-- Identify top customers and products
-- Measure category-wise performance
-- Support BI dashboards
+A retail company stores sales data in transactional format.  
+The company wants analytics-ready tables for reporting and dashboards.
 
-Data is available in raw transactional format.
-Goal is to design an analytics-ready schema using SQL.
+The goal is to:
+1. Clean and validate raw data
+2. Convert OLTP schema to OLAP (Star Schema)
+3. Create fact and dimension tables
+4. Build SQL KPI queries
+5. Optimize performance with indexing
+
