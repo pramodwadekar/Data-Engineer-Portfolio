@@ -1,0 +1,122 @@
+restaurant_id,restaurant_name,city,zone,cuisine
+1,Restaurant_001,Bengaluru,Central,South Indian
+2,Restaurant_002,Hyderabad,East,Biryani
+3,Restaurant_003,Nagpur,West,South Indian
+4,Restaurant_004,Bengaluru,North,
+5,Restaurant_005,Nashik,South,Biryani
+6,Restaurant_006,Hyderabad,South,Fast Food
+7,Restaurant_007,Hyderabad,North,Chinese
+8,Restaurant_008,Hyderabad,North,Cafe
+9,Restaurant_009,Nagpur,Central,Italian
+10,Restaurant_010,Mumbai,West,Fast Food
+11,Restaurant_011,Mumbai,Central,Fast Food
+12,Restaurant_012,Pune,South,Desserts
+13,Restaurant_013,Nagpur,West,Cafe
+14,Restaurant_014,Pune,East,Desserts
+15,Restaurant_015,Delhi,North,North Indian
+16,Restaurant_016,Bengaluru,North,Desserts
+17,Restaurant_017,Nagpur,East,Desserts
+18,Restaurant_018,Mumbai,Central,Fast Food
+19,Restaurant_019,Pune,East,Cafe
+20,Restaurant_020,Delhi,South,North Indian
+21,Restaurant_021,Bengaluru,Central,Chinese
+22,Restaurant_022,Pune,East,Chinese
+23,Restaurant_023,Nagpur,Central,Italian
+24,Restaurant_024,Pune,North,Fast Food
+25,Restaurant_025,Nagpur,North,Cafe
+26,Restaurant_026,Nagpur,West,Desserts
+27,Restaurant_027,Delhi,North,Desserts
+28,Restaurant_028,Chennai,South,Cafe
+29,Restaurant_029,Hyderabad,North,Chinese
+30,Restaurant_030,Nashik,West,Chinese
+31,Restaurant_031,Pune,Central,North Indian
+32,Restaurant_032,Nashik,East,South Indian
+33,Restaurant_033,Bengaluru,South,Fast Food
+34,Restaurant_034,Pune,South,Italian
+35,Restaurant_035,Nashik,South,Italian
+36,Restaurant_036,Chennai,West,Cafe
+37,Restaurant_037,Pune,South,Chinese
+38,Restaurant_038,Chennai,East,Biryani
+39,Restaurant_039,Delhi,East,Cafe
+40,Restaurant_040,Nagpur,East,Italian
+41,Restaurant_041,Bengaluru,East,North Indian
+42,Restaurant_042,Delhi,South,Fast Food
+43,Restaurant_043,Nagpur,South,Cafe
+44,Restaurant_044,Chennai,South,North Indian
+45,Restaurant_045,Pune,Central,North Indian
+46,Restaurant_046,Nashik,South,Desserts
+47,Restaurant_047,Nagpur,West,Chinese
+48,Restaurant_048,Nagpur,West,Italian
+49,Restaurant_049,Bengaluru,Central,North Indian
+50,Restaurant_050,Chennai,West,South Indian
+51,Restaurant_051,Nagpur,East,Fast Food
+52,Restaurant_052,Nagpur,North,Fast Food
+53,Restaurant_053,Pune,East,Italian
+54,Restaurant_054,Delhi,West,Chinese
+55,Restaurant_055,Mumbai,East,Cafe
+56,Restaurant_056,Nashik,East,Desserts
+57,Restaurant_057,Bengaluru,West,Cafe
+58,Restaurant_058,Nashik,South,Chinese
+59,Restaurant_059,Hyderabad,Central,Desserts
+60,Restaurant_060,Mumbai,West,Chinese
+61,Restaurant_061,Mumbai,East,Chinese
+62,Restaurant_062,Nashik,Central,Fast Food
+63,Restaurant_063,Nashik,West,Cafe
+64,Restaurant_064,Mumbai,South,Biryani
+65,Restaurant_065,Delhi,Central,Italian
+66,Restaurant_066,Pune,East,Cafe
+67,Restaurant_067,Delhi,Central,Cafe
+68,Restaurant_068,Pune,South,North Indian
+69,Restaurant_069,Nagpur,East,Desserts
+70,Restaurant_070,Mumbai,South,South Indian
+71,Restaurant_071,Pune,South,Italian
+72,Restaurant_072,Nagpur,North,Biryani
+73,Restaurant_073,Bengaluru,Central,Italian
+74,Restaurant_074,Mumbai,West,North Indian
+75,Restaurant_075,Mumbai,West,Biryani
+76,Restaurant_076,Pune,South,Desserts
+77,Restaurant_077,Nagpur,Central,Italian
+78,Restaurant_078,Bengaluru,North,North Indian
+79,Restaurant_079,Chennai,South,Italian
+80,Restaurant_080,Delhi,Central,South Indian
+81,Restaurant_081,Delhi,South,Biryani
+82,Restaurant_082,Chennai,West,South Indian
+83,Restaurant_083,Delhi,Central,Desserts
+84,Restaurant_084,Nagpur,East,North Indian
+85,Restaurant_085,Nagpur,South,North Indian
+86,Restaurant_086,Bengaluru,East,Desserts
+87,Restaurant_087,Nashik,North,Fast Food
+88,Restaurant_088,Chennai,West,South Indian
+89,Restaurant_089,Pune,East,Italian
+90,Restaurant_090,Nashik,East,Biryani
+91,Restaurant_091,Mumbai,East,North Indian
+92,Restaurant_092,Bengaluru,East,Biryani
+93,Restaurant_093,Pune,South,Fast Food
+94,Restaurant_094,Chennai,North,Desserts
+95,Restaurant_095,Nagpur,North,Chinese
+96,Restaurant_096,Chennai,North,Italian
+97,Restaurant_097,Bengaluru,South,Chinese
+98,Restaurant_098,Nashik,Central,Desserts
+99,Restaurant_099,Mumbai,East,Desserts
+100,Restaurant_100,Bengaluru,South,North Indian
+101,Restaurant_101,Chennai,North,Biryani
+102,Restaurant_102,Mumbai,East,Cafe
+103,Restaurant_103,Delhi,North,Italian
+104,Restaurant_104,Chennai,South,Desserts
+105,Restaurant_105,Chennai,South,Desserts
+106,Restaurant_106,Delhi,North,Fast Food
+107,Restaurant_107,Bengaluru,West,Chinese
+108,Restaurant_108,Nagpur,Central,Biryani
+109,Restaurant_109,Pune,East,Fast Food
+110,Restaurant_110,Hyderabad,West,Biryani
+111,Restaurant_111,Nashik,South,Italian
+112,Restaurant_112,Mumbai,West,Desserts
+113,Restaurant_113,Chennai,West,South Indian
+114,Restaurant_114,Delhi,Central,South Indian
+115,Restaurant_115,Delhi,South,Italian
+116,Restaurant_116,Mumbai,North,Italian
+117,Restaurant_117,Pune,Central,Cafe
+118,Restaurant_118,Pune,West,South Indian
+119,Restaurant_119,Chennai,Central,South Indian
+120,Restaurant_120,Hyderabad,East,Desserts
+16,Restaurant_016,Bengaluru,North,Desserts
