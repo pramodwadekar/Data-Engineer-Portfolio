@@ -1,6 +1,6 @@
 # 📚 SQL Learning Resources for DataEngineer
 
-This folder contains **trusted learning resources** used and recommended for mastering Python.
+This folder contains **trusted learning resources** used and recommended for mastering SQL.
 These are useful for **beginners, revision, and interview preparation**.
 
 ## 🌐 Online Documentation & Tutorials
