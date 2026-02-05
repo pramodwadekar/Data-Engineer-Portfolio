@@ -12,14 +12,6 @@ Databricks vs Local
 
 Basic Spark Configs (executor memory, shuffle partitions)
 
-============================================================================
 
-01. Installation + SparkSession
 
-PySpark install
 
-SparkSession create
-
-Spark configs (basic)
-
-Databricks vs Local
