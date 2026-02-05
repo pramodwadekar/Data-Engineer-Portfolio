@@ -14,12 +14,16 @@ best practices
 
 ===========================================================
 
-14. Transformations vs Actions
+16. Partitioning Concepts
 
-Lazy evaluation
+What is partition?
 
-transformations list
+repartition()
 
-actions list
+coalesce()
 
-DAG basics
+shuffle partitions
+
+partitionBy while writing
+
+best practices
