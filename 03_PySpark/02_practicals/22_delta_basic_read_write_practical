@@ -1,0 +1,123 @@
+# 22 - Delta Lake Basic (Read/Write) Practical (Databricks Must)
+
+This practical covers:
+- What is Delta table
+- Write Delta format
+- Read Delta format
+- Delta vs Parquet
+- Table vs path
+- Managed vs external Delta tables
+- Basic best practices
+
+⚠️ Delta is best tested in Databricks.
+
+---
+
+## 0) Setup (Databricks)
+
+In Databricks, SparkSession is already available as `spark`.
+
+If local Spark, Delta needs extra setup.
+(For learning, use Databricks.)
+
+---
+
+## 1) Create Sample DataFrame
+
+```python
+from pyspark.sql.functions import col
+
+data = [
+    (1, "Pramod", "IT", 50000),
+    (2, "Akash", "HR", 60000),
+    (3, "Rahul", "IT", 45000),
+    (4, "Neha", "Finance", 70000),
+]
+
+df = spark.createDataFrame(data, ["id", "name", "dept", "salary"])
+df.show()
+```
+
+---
+
+## 2) Write Delta (Path)
+
+```python
+delta_path = "/tmp/delta/employees"
+
+df.write.format("delta")     .mode("overwrite")     .save(delta_path)
+```
+
+---
+
+## 3) Read Delta (Path)
+
+```python
+df_delta = spark.read.format("delta").load(delta_path)
+df_delta.show()
+```
+
+---
+
+## 4) Delta vs Parquet (Key Points)
+
+Delta provides:
+✅ ACID transactions  
+✅ schema enforcement  
+✅ schema evolution  
+✅ time travel  
+✅ merge (upsert)  
+✅ optimize + zorder  
+
+Parquet is only a file format.
+
+---
+
+## 5) Create Delta Table (Managed Table)
+
+```python
+spark.sql("CREATE DATABASE IF NOT EXISTS de_portfolio")
+
+df.write.format("delta")     .mode("overwrite")     .saveAsTable("de_portfolio.employees_delta")
+```
+
+---
+
+## 6) Read Delta Table
+
+```python
+spark.table("de_portfolio.employees_delta").show()
+```
+
+---
+
+## 7) External Delta Table (Table on Path)
+
+```python
+spark.sql(f"""
+CREATE TABLE IF NOT EXISTS de_portfolio.employees_ext
+USING DELTA
+LOCATION '{delta_path}'
+""")
+```
+
+---
+
+## 8) Best Practices
+
+✅ Always use Delta in Databricks pipelines  
+✅ Prefer table name in production (governance)  
+✅ Use partitionBy for large tables  
+✅ Avoid small files (use optimize)  
+
+---
+
+## 9) Summary
+
+- Delta is Parquet + transaction log.
+- You can read/write delta by path or table.
+- Delta tables are standard in Databricks.
+
+---
+
+✅ Next Practical: `23_delta_merge_upsert_practical.md`
