@@ -1,0 +1,145 @@
+# 09 - groupBy() and Aggregations (PySpark Practical)
+
+This practical covers:
+- groupBy().count()
+- sum, avg, max, min
+- countDistinct
+- agg()
+- having equivalent
+- having-like filter using filter after aggregation
+
+---
+
+## 0) Setup
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, sum, avg, max, min, countDistinct
+
+spark = SparkSession.builder     .appName("GroupByAggregations")     .master("local[*]")     .getOrCreate()
+
+data = [
+    (1, "Pramod", "IT", 50000),
+    (2, "Akash", "HR", 60000),
+    (3, "Rahul", "IT", 45000),
+    (4, "Neha", "Finance", 70000),
+    (5, "Om", "HR", 40000),
+    (6, "Sagar", "IT", 50000),
+    (7, "Pooja", "Finance", 65000),
+]
+
+df = spark.createDataFrame(data, ["id", "name", "dept", "salary"])
+df.show()
+```
+
+---
+
+## 1) groupBy().count()
+
+```python
+df.groupBy("dept").count().show()
+```
+
+---
+
+## 2) Aggregations: sum, avg, max, min
+
+### 2.1 avg salary per dept
+
+```python
+df.groupBy("dept").avg("salary").show()
+```
+
+---
+
+### 2.2 Multiple aggregations using agg()
+
+```python
+df.groupBy("dept").agg(
+    sum("salary").alias("total_salary"),
+    avg("salary").alias("avg_salary"),
+    max("salary").alias("max_salary"),
+    min("salary").alias("min_salary")
+).show()
+```
+
+---
+
+## 3) countDistinct
+
+Count unique salaries per dept:
+
+```python
+df.groupBy("dept").agg(
+    countDistinct("salary").alias("unique_salary_count")
+).show()
+```
+
+---
+
+## 4) agg() (Multiple columns)
+
+Example: overall aggregations
+
+```python
+df.agg(
+    sum("salary").alias("company_total_salary"),
+    avg("salary").alias("company_avg_salary"),
+    max("salary").alias("company_max_salary"),
+    min("salary").alias("company_min_salary")
+).show()
+```
+
+---
+
+## 5) Having Equivalent (Spark DataFrame)
+
+Spark DataFrame has no direct having().
+We do:
+
+1) groupBy + agg
+2) filter on aggregated result
+
+---
+
+### 5.1 Example: departments where avg salary > 55000
+
+```python
+df_grouped = df.groupBy("dept").agg(avg("salary").alias("avg_salary"))
+
+df_grouped.filter(col("avg_salary") > 55000).show()
+```
+
+---
+
+## 6) Having-like Filter (count condition)
+
+Example: departments with more than 2 employees
+
+```python
+df_count = df.groupBy("dept").count()
+
+df_count.filter(col("count") > 2).show()
+```
+
+---
+
+## 7) Best Practices (Real DE Work)
+
+✅ Always use alias for aggregation columns  
+✅ Avoid too many groupBy on huge data without tuning partitions  
+✅ Use Spark SQL for complex aggregations if it improves readability  
+✅ Use AQE and shuffle partitions tuning for performance  
+
+---
+
+## 8) Summary
+
+- groupBy().count() gives group counts
+- agg() supports multiple aggregations
+- countDistinct counts unique values
+- having = groupBy + filter
+
+---
+
+✅ Next Practical: `10_joins_all_types_practical.md`
