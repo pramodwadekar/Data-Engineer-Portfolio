@@ -1,0 +1,98 @@
+# 37 - Deduplication Patterns (Real DE Practical)
+
+This practical covers:
+- dropDuplicates()
+- dedup using window (latest record)
+- dedup in incremental loads
+- best practices
+
+Deduplication is extremely common in pipelines.
+
+---
+
+## 0) Setup
+
+```python
+from pyspark.sql.functions import col, to_timestamp, row_number
+from pyspark.sql.window import Window
+```
+
+---
+
+## 1) Sample Duplicate Data
+
+```python
+data = [
+    (1, "Pramod", "2026-02-01 10:00:00"),
+    (1, "Pramod", "2026-02-01 12:00:00"),  # duplicate with newer time
+    (2, "Akash", "2026-02-01 09:00:00"),
+    (2, "Akash", "2026-02-01 09:00:00"),  # exact duplicate
+    (3, "Rahul", "2026-02-02 11:00:00"),
+]
+
+df = spark.createDataFrame(data, ["id", "name", "event_time"])
+df = df.withColumn("event_time", to_timestamp(col("event_time")))
+df.show(truncate=False)
+```
+
+---
+
+## 2) Dedup using dropDuplicates()
+
+### 2.1 Exact duplicates
+
+```python
+df.dropDuplicates().show(truncate=False)
+```
+
+---
+
+### 2.2 Dedup by subset of columns
+
+```python
+df.dropDuplicates(["id"]).show(truncate=False)
+```
+
+⚠️ This keeps random row per id (not latest).
+
+---
+
+## 3) Dedup Using Window (Latest Record) (Most Important)
+
+```python
+w = Window.partitionBy("id").orderBy(col("event_time").desc())
+
+df_latest = df.withColumn("rn", row_number().over(w))     .filter(col("rn") == 1)     .drop("rn")
+
+df_latest.show(truncate=False)
+```
+
+---
+
+## 4) Dedup Before MERGE (Incremental Load)
+
+Real pattern:
+1) source batch may have duplicates
+2) dedup using window
+3) then merge into target
+
+---
+
+## 5) Best Practices
+
+✅ Use dropDuplicates for exact duplicates  
+✅ Use window for latest record dedup  
+✅ Always dedup before MERGE  
+✅ Use watermark + event_time in streaming  
+
+---
+
+## 6) Summary
+
+- dropDuplicates is simple.
+- window dedup is production standard.
+- latest record dedup is asked in interviews.
+
+---
+
+✅ Next Practical: `38_scd_type1_type2_practical.md`
