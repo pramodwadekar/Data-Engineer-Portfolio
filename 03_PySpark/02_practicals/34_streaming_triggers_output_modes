@@ -1,0 +1,133 @@
+# 34 - Streaming Triggers + Output Modes (Structured Streaming Practical)
+
+This practical covers:
+- output modes: append, update, complete
+- triggers: processingTime, once, availableNow
+- watermark concept (intro)
+- real use case patterns
+
+---
+
+## 0) Setup
+
+Assume you already have a stream_df.
+
+Example:
+
+```python
+from pyspark.sql.types import StructType, StructField, IntegerType, StringType, TimestampType
+
+schema = StructType([
+    StructField("event_id", IntegerType(), True),
+    StructField("user_id", IntegerType(), True),
+    StructField("event_type", StringType(), True),
+    StructField("event_time", TimestampType(), True)
+])
+
+input_path = "/tmp/stream/input/events_json"
+
+stream_df = spark.readStream.schema(schema).json(input_path)
+```
+
+---
+
+## 1) Output Modes
+
+### 1.1 append mode (Most Common)
+- only new rows are written
+- best for raw event streaming
+
+```python
+query = stream_df.writeStream     .format("console")     .outputMode("append")     .start()
+```
+
+---
+
+### 1.2 update mode
+- only updated rows are written
+- used with aggregations
+
+Example: count events by type
+
+```python
+from pyspark.sql.functions import count
+
+agg_df = stream_df.groupBy("event_type").agg(count("*").alias("cnt"))
+
+query = agg_df.writeStream     .format("console")     .outputMode("update")     .start()
+```
+
+---
+
+### 1.3 complete mode
+- writes full result every time
+- heavy but useful for small aggregations
+
+```python
+query = agg_df.writeStream     .format("console")     .outputMode("complete")     .start()
+```
+
+---
+
+## 2) Triggers
+
+### 2.1 processingTime trigger
+Runs micro-batch every fixed interval.
+
+```python
+query = stream_df.writeStream     .format("delta")     .outputMode("append")     .option("checkpointLocation", "/tmp/checkpoints/t1")     .trigger(processingTime="10 seconds")     .start("/tmp/delta/streaming/t1")
+```
+
+---
+
+### 2.2 trigger once
+Runs one micro-batch and stops.
+
+```python
+query = stream_df.writeStream     .format("delta")     .outputMode("append")     .option("checkpointLocation", "/tmp/checkpoints/once")     .trigger(once=True)     .start("/tmp/delta/streaming/once")
+```
+
+---
+
+### 2.3 availableNow (Databricks)
+Processes all available data and stops.
+
+```python
+query = stream_df.writeStream     .format("delta")     .outputMode("append")     .option("checkpointLocation", "/tmp/checkpoints/an")     .trigger(availableNow=True)     .start("/tmp/delta/streaming/available_now")
+```
+
+---
+
+## 3) Watermark (Intro)
+
+Watermark handles late-arriving data.
+
+Example:
+
+```python
+from pyspark.sql.functions import window
+
+wm_df = stream_df     .withWatermark("event_time", "10 minutes")     .groupBy(window("event_time", "5 minutes"), "event_type")     .count()
+```
+
+---
+
+## 4) Best Practices
+
+✅ Use append for raw streaming  
+✅ Use update/complete for aggregations  
+✅ Use processingTime for continuous pipelines  
+✅ Use once/availableNow for micro-batch style jobs  
+✅ Use watermark for late events  
+
+---
+
+## 5) Summary
+
+- Output modes control what gets written.
+- Triggers control when micro-batches run.
+- Watermark handles late data.
+
+---
+
+✅ Next Practical: `35_streaming_kafka_basics.md`
