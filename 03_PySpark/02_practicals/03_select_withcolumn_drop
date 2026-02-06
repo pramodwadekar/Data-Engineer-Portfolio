@@ -1,0 +1,137 @@
+# 03 - select(), withColumn(), drop() (PySpark Practical)
+
+This practical covers:
+- select()
+- selectExpr()
+- withColumn()
+- drop()
+- alias()
+- rename columns
+- multiple column operations
+
+---
+
+## 0) Setup
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, lit
+
+spark = SparkSession.builder     .appName("SelectWithColumnDrop")     .master("local[*]")     .getOrCreate()
+
+data = [
+    (1, "Pramod", "IT", 50000),
+    (2, "Akash", "HR", 60000),
+    (3, "Rahul", "IT", 45000),
+    (4, "Neha", "Finance", 70000)
+]
+
+df = spark.createDataFrame(data, ["id", "name", "dept", "salary"])
+df.show()
+```
+
+---
+
+## 1) select() (Most Common)
+
+```python
+df.select("id", "name").show()
+```
+
+---
+
+## 2) select() using col()
+
+```python
+df.select(col("id"), col("dept"), col("salary")).show()
+```
+
+---
+
+## 3) alias() (Rename in select)
+
+```python
+df.select(
+    col("id"),
+    col("name").alias("employee_name"),
+    col("salary").alias("monthly_salary")
+).show()
+```
+
+---
+
+## 4) selectExpr() (SQL Style)
+
+```python
+df.selectExpr(
+    "id",
+    "name",
+    "salary",
+    "salary * 12 as annual_salary"
+).show()
+```
+
+---
+
+## 5) withColumn() (Add/Modify Column)
+
+### 5.1 Add new column
+
+```python
+df2 = df.withColumn("country", lit("India"))
+df2.show()
+```
+
+---
+
+### 5.2 Modify existing column
+
+```python
+df3 = df.withColumn("salary", col("salary") + 5000)
+df3.show()
+```
+
+---
+
+## 6) drop() (Remove Column)
+
+```python
+df4 = df.drop("dept")
+df4.show()
+```
+
+---
+
+## 7) Rename Columns (2 ways)
+
+### 7.1 withColumnRenamed()
+
+```python
+df5 = df.withColumnRenamed("dept", "department")
+df5.show()
+```
+
+---
+
+### 7.2 Rename multiple columns (recommended)
+Use toDF():
+
+```python
+df6 = df.toDF("emp_id", "emp_name", "department", "salary")
+df6.show()
+```
+
+---
+
+## 8) Summary
+
+- select() is used to pick columns.
+- alias() renames columns during selection.
+- withColumn() is used to add/modify columns.
+- drop() removes unwanted columns.
+- withColumnRenamed() renames one column.
+- toDF() renames all columns at once.
+
+---
+
+✅ Next Practical: `04_filter_where_conditions.md`
