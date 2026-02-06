@@ -1,0 +1,107 @@
+# 36 - Bucketing (bucketBy + sortBy) Practical (Advanced)
+
+This practical covers:
+- What is bucketing
+- bucketBy()
+- sortBy()
+- Bucketing vs Partitioning
+- When to use bucketing
+- Interview points
+
+⚠️ Note:
+Bucketing works best with Spark SQL tables (Hive metastore / Databricks tables).
+It is not always visible when writing only to plain paths.
+
+---
+
+## 1) What is Bucketing?
+Bucketing means:
+- Spark splits data into a fixed number of buckets
+- based on hash of a column
+- stored as bucket files
+
+Bucketing improves performance for:
+✅ joins  
+✅ aggregations  
+when joining on bucket column.
+
+---
+
+## 2) Partitioning vs Bucketing
+
+### Partitioning
+- creates folders (dept=IT/)
+- good for filtering (pruning)
+- too many partitions = too many small files
+
+### Bucketing
+- creates fixed number of files
+- no folder creation
+- good for joins
+
+---
+
+## 3) Create Sample Data
+
+```python
+df_emp = spark.range(1, 50000)     .withColumnRenamed("id", "emp_id")     .withColumn("dept_id", (col("emp_id") % 100).cast("int"))     .withColumn("salary", (col("emp_id") * 10).cast("int"))
+```
+
+```python
+df_dept = spark.range(0, 100)     .withColumnRenamed("id", "dept_id")     .withColumn("dept_name", concat(lit("DEPT_"), col("dept_id")))
+```
+
+---
+
+## 4) Create Bucketed Tables (Databricks Recommended)
+
+```python
+spark.sql("CREATE DATABASE IF NOT EXISTS de_portfolio")
+```
+
+### 4.1 Employees bucketed by dept_id
+
+```python
+df_emp.write.format("delta")     .mode("overwrite")     .bucketBy(8, "dept_id")     .sortBy("dept_id")     .saveAsTable("de_portfolio.emp_bucketed")
+```
+
+### 4.2 Departments bucketed by dept_id
+
+```python
+df_dept.write.format("delta")     .mode("overwrite")     .bucketBy(8, "dept_id")     .sortBy("dept_id")     .saveAsTable("de_portfolio.dept_bucketed")
+```
+
+---
+
+## 5) Join Bucketed Tables
+
+```python
+emp = spark.table("de_portfolio.emp_bucketed")
+dept = spark.table("de_portfolio.dept_bucketed")
+
+joined = emp.join(dept, "dept_id", "inner")
+joined.explain("formatted")
+```
+
+If Spark uses bucketing properly, join becomes faster.
+
+---
+
+## 6) Best Practices
+
+✅ Use bucketing only for frequently joined tables  
+✅ Use same bucket count on both tables  
+✅ Use bucket column as join key  
+✅ Bucketing is more useful in data warehouse style pipelines  
+
+---
+
+## 7) Summary
+
+- Bucketing improves join performance.
+- Partitioning improves filter performance.
+- Bucketing is advanced but asked in interviews.
+
+---
+
+✅ Next Practical: `37_deduplication_patterns_practical.md`
