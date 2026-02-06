@@ -1,0 +1,101 @@
+# 29 - Schema Evolution (Delta) Practical (Real DE Work)
+
+This practical covers:
+- What is schema evolution
+- Adding new columns
+- mergeSchema option
+- overwriteSchema option
+- Best practices
+
+Schema evolution is common when source changes.
+
+---
+
+## 0) Setup
+
+Use Delta table path.
+
+---
+
+## 1) Create Initial Delta Table
+
+```python
+data_v1 = [
+    (1, "Pramod", 50000),
+    (2, "Akash", 60000)
+]
+
+df_v1 = spark.createDataFrame(data_v1, ["id", "name", "salary"])
+
+delta_path = "/tmp/delta/schema_evolution/employees"
+
+df_v1.write.format("delta").mode("overwrite").save(delta_path)
+```
+
+---
+
+## 2) New Data with Extra Column (dept)
+
+```python
+data_v2 = [
+    (3, "Rahul", 45000, "IT"),
+    (4, "Neha", 70000, "Finance")
+]
+
+df_v2 = spark.createDataFrame(data_v2, ["id", "name", "salary", "dept"])
+df_v2.show()
+df_v2.printSchema()
+```
+
+---
+
+## 3) Write with mergeSchema (Add new column)
+
+```python
+df_v2.write.format("delta")     .mode("append")     .option("mergeSchema", "true")     .save(delta_path)
+```
+
+---
+
+## 4) Read Final Table
+
+```python
+spark.read.format("delta").load(delta_path).show(truncate=False)
+spark.read.format("delta").load(delta_path).printSchema()
+```
+
+Now schema includes dept.
+
+---
+
+## 5) overwriteSchema (Replace schema) (Careful)
+
+Example: overwrite with new schema.
+
+```python
+df_v2.write.format("delta")     .mode("overwrite")     .option("overwriteSchema", "true")     .save(delta_path)
+```
+
+⚠️ This replaces table schema and data.
+
+---
+
+## 6) Best Practices
+
+✅ Use mergeSchema only when required  
+✅ Prefer controlled schema changes (versioning)  
+✅ Avoid frequent schema evolution in gold tables  
+✅ Validate schema changes in dev before prod  
+✅ Use Unity Catalog for governance in Databricks  
+
+---
+
+## 7) Summary
+
+- Schema evolution allows adding new columns.
+- mergeSchema appends new schema safely.
+- overwriteSchema replaces schema (dangerous).
+
+---
+
+✅ Next Practical: `30_idempotency_replacewhere_practical.md`
