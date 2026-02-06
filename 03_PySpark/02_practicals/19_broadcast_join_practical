@@ -1,0 +1,127 @@
+# 19 - Broadcast Join (PySpark Practical)
+
+This practical covers:
+- What is broadcast join
+- Why broadcast join is fast
+- How to use broadcast()
+- autoBroadcastJoinThreshold
+- When NOT to broadcast
+- Real DE examples
+
+Broadcast join is one of the best optimizations in Spark.
+
+---
+
+## 0) Setup
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import broadcast
+
+spark = SparkSession.builder     .appName("BroadcastJoinPractical")     .master("local[*]")     .getOrCreate()
+```
+
+---
+
+## 1) Create Big and Small DataFrames
+
+Big table (fact):
+
+```python
+big_df = spark.range(1, 1000000).withColumnRenamed("id", "key")
+```
+
+Small table (dimension):
+
+```python
+small_df = spark.range(1, 1000).withColumnRenamed("id", "key")
+```
+
+---
+
+## 2) Normal Join (May cause shuffle)
+
+```python
+join_normal = big_df.join(small_df, "key", "inner")
+join_normal.explain("formatted")
+```
+
+---
+
+## 3) Broadcast Join (Best)
+
+```python
+join_broadcast = big_df.join(broadcast(small_df), "key", "inner")
+join_broadcast.explain("formatted")
+```
+
+Look for:
+- BroadcastHashJoin
+
+---
+
+## 4) autoBroadcastJoinThreshold
+
+Spark auto broadcasts small tables under threshold.
+
+Check threshold:
+
+```python
+spark.conf.get("spark.sql.autoBroadcastJoinThreshold")
+```
+
+Default ~ 10MB.
+
+Change threshold (example 20MB):
+
+```python
+spark.conf.set("spark.sql.autoBroadcastJoinThreshold", 20971520)
+```
+
+---
+
+## 5) When NOT to Broadcast
+
+Do NOT broadcast when:
+❌ table is large  
+❌ executor memory is limited  
+❌ broadcast causes OOM  
+
+Broadcast sends table to every executor.
+
+---
+
+## 6) Real DE Example
+
+Dimension table: dept (small)  
+Fact table: employees (big)
+
+```python
+dept = spark.createDataFrame([(101, "IT"), (102, "HR"), (103, "Finance")], ["dept_id", "dept_name"])
+emp = spark.createDataFrame([(1, 101), (2, 102), (3, 101)], ["emp_id", "dept_id"])
+
+final_df = emp.join(broadcast(dept), "dept_id", "left")
+final_df.show()
+```
+
+---
+
+## 7) Best Practices
+
+✅ Broadcast only small dimension tables  
+✅ Use explain() to confirm BroadcastHashJoin  
+✅ Use AQE for dynamic join optimization  
+✅ Avoid broadcasting multiple large tables  
+
+---
+
+## 8) Summary
+
+- Broadcast join avoids shuffle.
+- Best for small dimension tables.
+- Use broadcast() to force.
+- autoBroadcastJoinThreshold controls auto broadcast.
+
+---
+
+✅ Next Practical: `20_data_skew_handling_practical.md`
