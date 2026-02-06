@@ -1,0 +1,212 @@
+# 08 - Read & Write CSV, JSON, Parquet (PySpark Practical)
+
+This practical covers:
+- CSV read/write
+- JSON read/write
+- Parquet read/write
+- schema inference vs manual schema
+- write modes (overwrite/append/ignore/errorifexists)
+- partitionBy while writing
+- compression
+
+---
+
+## 0) Setup
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col
+from pyspark.sql.types import StructType, StructField, IntegerType, StringType
+
+spark = SparkSession.builder     .appName("ReadWriteFiles")     .master("local[*]")     .getOrCreate()
+```
+
+---
+
+## 1) Sample DataFrame
+
+```python
+data = [
+    (1, "Pramod", "IT", 50000),
+    (2, "Akash", "HR", 60000),
+    (3, "Rahul", "IT", 45000),
+    (4, "Neha", "Finance", 70000)
+]
+
+df = spark.createDataFrame(data, ["id", "name", "dept", "salary"])
+df.show()
+```
+
+---
+
+## 2) CSV Read/Write
+
+### 2.1 Write CSV
+
+```python
+df.write.mode("overwrite")     .option("header", "true")     .csv("output/csv/employees")
+```
+
+---
+
+### 2.2 Read CSV (Infer schema)
+
+```python
+df_csv = spark.read     .option("header", "true")     .option("inferSchema", "true")     .csv("output/csv/employees")
+
+df_csv.printSchema()
+df_csv.show()
+```
+
+---
+
+### 2.3 Read CSV (Manual schema) (Recommended)
+
+```python
+schema = StructType([
+    StructField("id", IntegerType(), True),
+    StructField("name", StringType(), True),
+    StructField("dept", StringType(), True),
+    StructField("salary", IntegerType(), True),
+])
+
+df_csv2 = spark.read     .option("header", "true")     .schema(schema)     .csv("output/csv/employees")
+
+df_csv2.printSchema()
+df_csv2.show()
+```
+
+---
+
+## 3) JSON Read/Write
+
+### 3.1 Write JSON
+
+```python
+df.write.mode("overwrite").json("output/json/employees")
+```
+
+---
+
+### 3.2 Read JSON
+
+```python
+df_json = spark.read.json("output/json/employees")
+df_json.printSchema()
+df_json.show()
+```
+
+---
+
+## 4) Parquet Read/Write (Most Used)
+
+### 4.1 Write Parquet
+
+```python
+df.write.mode("overwrite").parquet("output/parquet/employees")
+```
+
+---
+
+### 4.2 Read Parquet
+
+```python
+df_parquet = spark.read.parquet("output/parquet/employees")
+df_parquet.show()
+```
+
+---
+
+## 5) Write Modes (Must Know)
+
+Spark write modes:
+- overwrite
+- append
+- ignore
+- errorifexists
+
+---
+
+### 5.1 overwrite
+
+```python
+df.write.mode("overwrite").parquet("output/parquet/employees")
+```
+
+---
+
+### 5.2 append
+
+```python
+df.write.mode("append").parquet("output/parquet/employees")
+```
+
+---
+
+### 5.3 ignore
+If path exists, Spark does nothing.
+
+```python
+df.write.mode("ignore").parquet("output/parquet/employees")
+```
+
+---
+
+### 5.4 errorifexists
+If path exists, Spark throws error.
+
+```python
+df.write.mode("errorifexists").parquet("output/parquet/employees")
+```
+
+---
+
+## 6) partitionBy while Writing (Real DE Work)
+
+Partition by dept:
+
+```python
+df.write.mode("overwrite")     .partitionBy("dept")     .parquet("output/parquet/employees_partitioned")
+```
+
+Folder structure:
+
+```
+employees_partitioned/
+  dept=IT/
+  dept=HR/
+  dept=Finance/
+```
+
+---
+
+## 7) Compression
+
+Parquet uses compression by default (snappy).
+
+You can set compression:
+
+```python
+df.write.mode("overwrite")     .option("compression", "snappy")     .parquet("output/parquet/employees_snappy")
+```
+
+Other options:
+- gzip (more compression, slower)
+- lz4
+- zstd (if supported)
+
+---
+
+## 8) Summary
+
+- CSV is common for raw ingestion.
+- JSON is common for APIs.
+- Parquet is best for analytics.
+- Manual schema is recommended.
+- Write modes control output behavior.
+- partitionBy improves query performance.
+- Compression reduces storage cost.
+
+---
+
+✅ Next Practical: `09_groupby_aggregations_practical.md`
