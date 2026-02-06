@@ -1,0 +1,125 @@
+# 26 - Bronze → Silver ETL Pipeline (Delta Practical) (Real Project)
+
+This practical covers a real pipeline pattern:
+- ingest → clean → transform → load
+- bronze layer (raw)
+- silver layer (clean)
+- schema enforcement
+- audit columns
+- idempotency idea
+- incremental batch concept
+
+This is a real Data Engineering project pattern.
+
+---
+
+## 0) Architecture (Bronze-Silver)
+
+### Bronze Layer
+- raw ingestion
+- minimal transformation
+- schema may be loose
+- keeps source truth
+
+### Silver Layer
+- cleaned and standardized
+- correct schema
+- null handling
+- business ready
+
+---
+
+## 1) Create Sample Raw Data (Bronze)
+
+```python
+from pyspark.sql.functions import col, current_timestamp, trim, upper, coalesce, lit, to_date
+
+raw_data = [
+    (1, "  pramod  ", "it", "2026-02-01", "50000"),
+    (2, "akash", "hr", "2026-02-02", None),
+    (3, None, "it", "2026-02-03", "45000"),
+    (4, "neha", None, None, "70000")
+]
+
+raw_df = spark.createDataFrame(raw_data, ["id", "name", "dept", "join_date", "salary"])
+raw_df.show(truncate=False)
+```
+
+---
+
+## 2) Write Bronze Delta Table
+
+```python
+bronze_path = "/tmp/delta/bronze/employees"
+
+raw_df.write.format("delta")     .mode("overwrite")     .save(bronze_path)
+```
+
+---
+
+## 3) Read Bronze
+
+```python
+bronze_df = spark.read.format("delta").load(bronze_path)
+bronze_df.show(truncate=False)
+```
+
+---
+
+## 4) Clean + Transform for Silver
+
+Silver rules:
+- trim + uppercase name
+- dept uppercase
+- join_date convert to date
+- salary cast to int
+- null handling
+- add audit columns
+
+```python
+silver_df = bronze_df     .withColumn("name", upper(trim(coalesce(col("name"), lit("UNKNOWN")))))     .withColumn("dept", upper(trim(coalesce(col("dept"), lit("UNKNOWN")))))     .withColumn("join_date", to_date(col("join_date")))     .withColumn("salary", coalesce(col("salary").cast("int"), lit(0)))     .withColumn("created_at", current_timestamp())     .withColumn("updated_at", current_timestamp())
+
+silver_df.show(truncate=False)
+silver_df.printSchema()
+```
+
+---
+
+## 5) Write Silver Delta Table
+
+```python
+silver_path = "/tmp/delta/silver/employees"
+
+silver_df.write.format("delta")     .mode("overwrite")     .save(silver_path)
+```
+
+---
+
+## 6) Validate Silver Output
+
+```python
+spark.read.format("delta").load(silver_path).show(truncate=False)
+```
+
+---
+
+## 7) Best Practices
+
+✅ Bronze should keep raw data  
+✅ Silver should apply data quality rules  
+✅ Add audit columns in silver  
+✅ Use Delta for both layers  
+✅ Use MERGE for incremental loads (next practicals)  
+
+---
+
+## 8) Summary
+
+- Bronze = raw ingestion
+- Silver = clean standardized layer
+- Delta format is used in Databricks
+- This is real DE pipeline design
+
+---
+
+✅ Next Practical: `27_silver_to_gold_aggregations_practical.md`
