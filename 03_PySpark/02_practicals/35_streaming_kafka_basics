@@ -1,0 +1,141 @@
+# 35 - Kafka Basics with PySpark (Structured Streaming) (Interview + Optional)
+
+This practical covers:
+- What is Kafka
+- topic, partition, offset
+- consumer group concept
+- readStream from Kafka (syntax)
+- writeStream to Kafka (syntax)
+- real use cases
+
+Kafka is often asked in interviews.
+
+---
+
+## 1) Kafka Basics
+
+Kafka is a distributed messaging system used for:
+- real-time data streaming
+- event pipelines
+- log collection
+
+---
+
+## 2) Important Kafka Terms
+
+### Topic
+A category/stream of messages.
+
+Example:
+- `user_events`
+- `orders`
+
+---
+
+### Partition
+Each topic is divided into partitions.
+
+Partitions provide:
+- parallelism
+- scalability
+
+---
+
+### Offset
+Each message inside a partition has an offset.
+Offset is like message ID.
+
+---
+
+### Consumer Group
+Multiple consumers share partitions.
+This provides:
+- load balancing
+- fault tolerance
+
+---
+
+## 3) Read Stream from Kafka (PySpark)
+
+```python
+kafka_df = spark.readStream     .format("kafka")     .option("kafka.bootstrap.servers", "localhost:9092")     .option("subscribe", "user_events")     .option("startingOffsets", "latest")     .load()
+```
+
+Kafka DF schema contains:
+- key (binary)
+- value (binary)
+- topic
+- partition
+- offset
+- timestamp
+
+---
+
+## 4) Convert Kafka Value to String
+
+```python
+from pyspark.sql.functions import col
+
+parsed_df = kafka_df.selectExpr(
+    "CAST(key AS STRING) as key",
+    "CAST(value AS STRING) as value",
+    "topic",
+    "partition",
+    "offset",
+    "timestamp"
+)
+
+parsed_df.writeStream.format("console").outputMode("append").start()
+```
+
+---
+
+## 5) Write Stream to Kafka (PySpark)
+
+Example: send output to kafka topic.
+
+```python
+out_df = parsed_df.selectExpr(
+    "CAST(key AS STRING) as key",
+    "CAST(value AS STRING) as value"
+)
+
+query = out_df.writeStream     .format("kafka")     .option("kafka.bootstrap.servers", "localhost:9092")     .option("topic", "processed_events")     .option("checkpointLocation", "/tmp/checkpoints/kafka_out")     .start()
+```
+
+---
+
+## 6) Real Use Cases
+
+✅ Event streaming pipelines  
+✅ Real-time fraud detection  
+✅ User activity tracking  
+✅ IoT sensor streaming  
+✅ Streaming ETL into Delta tables  
+
+---
+
+## 7) Best Practices
+
+✅ Always use checkpointing  
+✅ Use schema validation after reading Kafka  
+✅ Handle late events using watermark  
+✅ Partition topics properly  
+✅ Monitor lag in consumer groups  
+
+---
+
+## 8) Summary
+
+- Kafka is real-time event system.
+- Topic → partition → offset are core.
+- Spark can read/write kafka streams.
+- Kafka is optional but powerful.
+
+---
+
+🎉 Congratulations!
+You completed **PySpark Practicals Basic → Advanced**.
+
+Next step:
+✅ Build 1 end-to-end project in `03_projects/`
