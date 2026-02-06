@@ -1,0 +1,92 @@
+# 27 - Silver → Gold Aggregations (Delta Practical) (Real Project)
+
+This practical covers:
+- What is Gold layer
+- Creating business aggregates
+- Daily/monthly reporting table
+- Writing gold Delta table
+- Best practices
+
+Gold layer is the final analytics-ready layer.
+
+---
+
+## 0) Concept
+
+### Silver Layer
+- cleaned data
+- standardized schema
+
+### Gold Layer
+- business KPIs
+- reporting tables
+- aggregates for dashboards
+
+---
+
+## 1) Read Silver Table
+
+```python
+from pyspark.sql.functions import col, sum, avg, count, trunc
+
+silver_path = "/tmp/delta/silver/employees"
+
+silver_df = spark.read.format("delta").load(silver_path)
+silver_df.show(truncate=False)
+```
+
+---
+
+## 2) Create Gold Aggregation
+
+Example: dept level summary
+
+```python
+gold_df = silver_df.groupBy("dept").agg(
+    count("*").alias("employee_count"),
+    sum("salary").alias("total_salary"),
+    avg("salary").alias("avg_salary")
+)
+
+gold_df.show()
+```
+
+---
+
+## 3) Write Gold Delta Table
+
+```python
+gold_path = "/tmp/delta/gold/dept_salary_summary"
+
+gold_df.write.format("delta")     .mode("overwrite")     .save(gold_path)
+```
+
+---
+
+## 4) Validate Gold Output
+
+```python
+spark.read.format("delta").load(gold_path).show()
+```
+
+---
+
+## 5) Gold Table Best Practices
+
+✅ Gold should contain only business logic  
+✅ Avoid raw columns in gold  
+✅ Use proper naming and documentation  
+✅ Optimize gold tables for query performance  
+✅ Use ZORDER for frequently filtered columns  
+
+---
+
+## 6) Summary
+
+- Gold is final reporting layer.
+- Gold tables are aggregates/KPIs.
+- Gold is used for Power BI, Tableau, dashboards.
+
+---
+
+✅ Next Practical: `28_incremental_load_practical.md`
