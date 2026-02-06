@@ -1,0 +1,121 @@
+# 30 - Idempotency + replaceWhere (Delta) Practical (Real DE Work)
+
+This practical covers:
+- What is idempotency
+- Why idempotency is required in pipelines
+- How duplicates happen
+- replaceWhere option in Delta
+- Reprocessing a partition safely
+- Best practices
+
+Idempotency is a MUST concept for production pipelines.
+
+---
+
+## 1) What is Idempotency?
+
+Idempotency means:
+✅ If you run the same pipeline 2 times, output should remain the same  
+(no duplicate data, no double counts)
+
+---
+
+## 2) Real Problem
+
+Suppose we load daily data into a Delta table:
+
+- Day = 2026-02-01
+- Day = 2026-02-02
+
+If pipeline fails and re-runs day=2026-02-01 again:
+- append mode will duplicate data
+
+---
+
+## 3) Create Sample Daily Data
+
+```python
+from pyspark.sql.functions import lit, to_date
+
+day1 = [
+    (1, "Pramod", 50000),
+    (2, "Akash", 60000)
+]
+
+day2 = [
+    (3, "Rahul", 45000),
+    (4, "Neha", 70000)
+]
+
+df_day1 = spark.createDataFrame(day1, ["id", "name", "salary"])     .withColumn("load_date", to_date(lit("2026-02-01")))
+
+df_day2 = spark.createDataFrame(day2, ["id", "name", "salary"])     .withColumn("load_date", to_date(lit("2026-02-02")))
+```
+
+---
+
+## 4) Write Initial Delta Table (Partitioned)
+
+```python
+delta_path = "/tmp/delta/idempotency/employees_daily"
+
+df_day1.write.format("delta")     .mode("overwrite")     .partitionBy("load_date")     .save(delta_path)
+
+df_day2.write.format("delta")     .mode("append")     .partitionBy("load_date")     .save(delta_path)
+
+spark.read.format("delta").load(delta_path).show()
+```
+
+---
+
+## 5) Problem: Reprocessing Day1 (Duplicates)
+
+If we do append again:
+
+```python
+df_day1.write.format("delta")     .mode("append")     .partitionBy("load_date")     .save(delta_path)
+```
+
+Now day1 rows will be duplicated.
+
+---
+
+## 6) Solution: replaceWhere (Best)
+
+Instead of append, use overwrite with replaceWhere.
+
+```python
+df_day1.write.format("delta")     .mode("overwrite")     .option("replaceWhere", "load_date = '2026-02-01'")     .save(delta_path)
+```
+
+Now Spark overwrites only that partition.
+
+---
+
+## 7) Verify Output
+
+```python
+spark.read.format("delta").load(delta_path)     .orderBy("load_date", "id")     .show()
+```
+
+---
+
+## 8) Best Practices
+
+✅ Partition tables by date for incremental loads  
+✅ Use replaceWhere for safe reprocessing  
+✅ Track batch_id and load_date  
+✅ Use MERGE for upserts  
+✅ Make pipeline idempotent always  
+
+---
+
+## 9) Summary
+
+- append can create duplicates during reruns.
+- replaceWhere overwrites only specific partition.
+- idempotency is required in production.
+
+---
+
+✅ Next Practical: `31_audit_columns_batch_id_practical.md`
