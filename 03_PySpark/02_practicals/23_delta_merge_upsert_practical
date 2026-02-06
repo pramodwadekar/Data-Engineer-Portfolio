@@ -1,0 +1,148 @@
+# 23 - Delta MERGE (Upsert) Practical (Databricks Must)
+
+This practical covers:
+- What is Upsert
+- MERGE INTO syntax
+- Insert new records
+- Update existing records
+- Delete condition (optional)
+- Real DE incremental load pattern
+
+MERGE is one of the most important Delta Lake features.
+
+---
+
+## 0) Setup
+
+Use Databricks for this practical.
+
+---
+
+## 1) Create Target Delta Table
+
+```python
+from pyspark.sql.functions import col
+
+target_data = [
+    (1, "Pramod", "IT", 50000),
+    (2, "Akash", "HR", 60000),
+    (3, "Rahul", "IT", 45000),
+]
+
+target_df = spark.createDataFrame(target_data, ["id", "name", "dept", "salary"])
+
+target_path = "/tmp/delta/employees_merge_target"
+
+target_df.write.format("delta")     .mode("overwrite")     .save(target_path)
+```
+
+---
+
+## 2) Create Source Data (New Batch)
+
+This batch contains:
+- update for id=2
+- new record id=4
+
+```python
+source_data = [
+    (2, "Akash", "HR", 65000),       # updated salary
+    (4, "Neha", "Finance", 70000)    # new row
+]
+
+source_df = spark.createDataFrame(source_data, ["id", "name", "dept", "salary"])
+```
+
+---
+
+## 3) Register as Temp Views
+
+```python
+spark.read.format("delta").load(target_path).createOrReplaceTempView("target_emp")
+source_df.createOrReplaceTempView("source_emp")
+```
+
+---
+
+## 4) MERGE INTO (Upsert)
+
+```python
+spark.sql(f"""
+MERGE INTO delta.`{target_path}` AS t
+USING source_emp AS s
+ON t.id = s.id
+WHEN MATCHED THEN UPDATE SET *
+WHEN NOT MATCHED THEN INSERT *
+""")
+```
+
+---
+
+## 5) Verify Result
+
+```python
+spark.read.format("delta").load(target_path).show()
+```
+
+Expected:
+- id=2 salary updated to 65000
+- id=4 inserted
+
+---
+
+## 6) MERGE with Conditions (Advanced)
+
+Example:
+- update only if salary is changed
+
+```python
+spark.sql(f"""
+MERGE INTO delta.`{target_path}` AS t
+USING source_emp AS s
+ON t.id = s.id
+WHEN MATCHED AND t.salary <> s.salary THEN UPDATE SET *
+WHEN NOT MATCHED THEN INSERT *
+""")
+```
+
+---
+
+## 7) MERGE with Delete (Optional)
+
+Example: delete rows if dept = 'IT' from source.
+
+```python
+spark.sql(f"""
+MERGE INTO delta.`{target_path}` AS t
+USING source_emp AS s
+ON t.id = s.id
+WHEN MATCHED AND s.dept = 'IT' THEN DELETE
+WHEN MATCHED THEN UPDATE SET *
+WHEN NOT MATCHED THEN INSERT *
+""")
+```
+
+---
+
+## 8) Real DE Pattern (Incremental Loads)
+
+Typical pipeline:
+- read new batch (source)
+- merge into silver table
+- create gold aggregates
+
+MERGE helps maintain latest state.
+
+---
+
+## 9) Summary
+
+- MERGE INTO supports upsert.
+- Updates existing records.
+- Inserts new records.
+- Supports conditions + deletes.
+- Used in incremental pipelines.
+
+---
+
+✅ Next Practical: `24_delta_time_travel_practical.md`
