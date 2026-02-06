@@ -1,0 +1,124 @@
+# 14 - UDF vs Built-in Functions (PySpark Practical)
+
+This practical covers:
+- What is UDF
+- Normal UDF
+- Why UDF is slow
+- When NOT to use UDF
+- pandas_udf basics
+- Best alternatives using built-in functions
+
+---
+
+## 0) Setup
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, udf, upper, trim, coalesce, lit
+from pyspark.sql.types import StringType
+
+spark = SparkSession.builder     .appName("UDFvsBuiltinPractical")     .master("local[*]")     .getOrCreate()
+```
+
+Sample DataFrame:
+
+```python
+data = [
+    (1, "  pramod  "),
+    (2, "akash"),
+    (3, None)
+]
+
+df = spark.createDataFrame(data, ["id", "name"])
+df.show()
+```
+
+---
+
+## 1) Normal UDF Example
+
+### 1.1 Python function
+
+```python
+def clean_name(x):
+    if x is None:
+        return "UNKNOWN"
+    return x.strip().upper()
+```
+
+### 1.2 Register UDF
+
+```python
+clean_name_udf = udf(clean_name, StringType())
+```
+
+### 1.3 Apply UDF
+
+```python
+df_udf = df.withColumn("name_clean", clean_name_udf(col("name")))
+df_udf.show()
+```
+
+---
+
+## 2) Why UDF is NOT Recommended
+Because:
+- Spark cannot optimize it
+- it runs in Python worker
+- JVM ↔ Python conversion overhead
+
+---
+
+## 3) Built-in Alternative (Recommended)
+
+```python
+df_builtin = df.withColumn(
+    "name_clean",
+    upper(trim(coalesce(col("name"), lit("UNKNOWN"))))
+)
+
+df_builtin.show()
+```
+
+This is:
+✅ faster  
+✅ optimized by Catalyst  
+✅ production ready  
+
+---
+
+## 4) pandas_udf (Vectorized) (Basics)
+
+pandas_udf is faster than normal udf.
+
+```python
+import pandas as pd
+from pyspark.sql.functions import pandas_udf
+
+@pandas_udf(StringType())
+def clean_name_pandas(s: pd.Series) -> pd.Series:
+    return s.fillna("UNKNOWN").str.strip().str.upper()
+
+df_pandas = df.withColumn("name_clean", clean_name_pandas(col("name")))
+df_pandas.show()
+```
+
+---
+
+## 5) When to Use UDF (Rare)
+Use UDF only when:
+- logic is complex and cannot be done using built-in
+- external library is needed
+
+---
+
+## 6) Summary
+
+- Normal UDF works but slow.
+- Built-in functions are always preferred.
+- pandas_udf is faster than normal udf.
+- In real DE, avoid UDF unless required.
+
+---
+
+✅ Next Practical: `15_spark_sql_practical.md`
