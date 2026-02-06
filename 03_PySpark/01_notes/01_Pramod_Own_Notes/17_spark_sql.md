@@ -10,15 +10,3 @@ Spark SQL vs DataFrame API
 
 best practices
 
-
-==========================================
-
-18. Spark SQL
-
-createOrReplaceTempView
-
-SQL queries
-
-SQL vs DataFrame API
-
-best practices
