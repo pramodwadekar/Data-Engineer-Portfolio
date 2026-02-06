@@ -71,6 +71,16 @@ Each practical is designed like a real Data Engineering task:
 
 ---
 
+### ⭐ Level 7: Extra Advanced (Top 1% Portfolio)
+36. `36_bucketing_practical.md`  
+37. `37_deduplication_patterns_practical.md`  
+38. `38_scd_type1_type2_practical.md`  
+39. `39_bad_records_quarantine_practical.md`  
+40. `40_data_quality_checks_practical.md`  
+41. `41_databricks_autoloader_cloudfiles.md`  
+
+---
+
 ## ⭐ How to Use These Practicals
 1. Start from `01_spark_session_basics.md`
 2. Copy code into:
@@ -88,3 +98,8 @@ After completing these practicals, you will be ready for:
 ✅ PySpark Developer  
 ✅ Big Data Engineer  
 
+---
+
+## 💡 Notes
+- For **Delta / Auto Loader / Streaming**, Databricks is recommended.
+- For **core PySpark**, local mode is enough.
