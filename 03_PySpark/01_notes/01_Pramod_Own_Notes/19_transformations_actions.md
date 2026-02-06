@@ -9,15 +9,3 @@ Transformations list
 Actions list
 
 DAG explanation
-
-===============================================
-
-14. Transformations vs Actions
-
-Lazy evaluation
-
-transformations list
-
-actions list
-
-DAG basics
