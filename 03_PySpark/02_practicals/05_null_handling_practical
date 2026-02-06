@@ -1,0 +1,155 @@
+# 05 - Null Handling (Real DE Practical)
+
+This practical covers:
+- isNull() / isNotNull()
+- dropna()
+- fillna()
+- replace()
+- coalesce()
+- nvl() concept
+- real DE cleaning pattern
+
+Null handling is extremely common in Data Engineering pipelines.
+
+---
+
+## 0) Setup
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, coalesce, lit
+
+spark = SparkSession.builder     .appName("NullHandlingPractical")     .master("local[*]")     .getOrCreate()
+
+data = [
+    (1, "Pramod", "IT", 50000),
+    (2, None, "HR", 60000),
+    (3, "Rahul", None, None),
+    (4, "Neha", "Finance", 70000),
+    (5, None, None, 40000)
+]
+
+df = spark.createDataFrame(data, ["id", "name", "dept", "salary"])
+df.show()
+df.printSchema()
+```
+
+---
+
+## 1) isNull() and isNotNull()
+
+### 1.1 Find rows where name is null
+
+```python
+df.filter(col("name").isNull()).show()
+```
+
+### 1.2 Find rows where dept is not null
+
+```python
+df.filter(col("dept").isNotNull()).show()
+```
+
+---
+
+## 2) dropna()
+
+### 2.1 Drop rows with ANY nulls
+
+```python
+df.dropna().show()
+```
+
+---
+
+### 2.2 Drop rows where salary is null (subset)
+
+```python
+df.dropna(subset=["salary"]).show()
+```
+
+---
+
+## 3) fillna()
+
+### 3.1 Fill nulls in all string columns
+
+```python
+df_fill = df.fillna({
+    "name": "UNKNOWN",
+    "dept": "UNKNOWN"
+})
+df_fill.show()
+```
+
+---
+
+### 3.2 Fill nulls in numeric columns
+
+```python
+df_fill2 = df.fillna({"salary": 0})
+df_fill2.show()
+```
+
+---
+
+## 4) replace()
+
+Replace values (not only nulls).
+
+Example: Replace dept name
+
+```python
+df_replace = df.fillna({"dept": "UNKNOWN"}).replace("HR", "HumanResource", subset=["dept"])
+df_replace.show()
+```
+
+---
+
+## 5) coalesce() (Most Important)
+
+coalesce() returns first non-null value.
+
+Example: replace null name with "UNKNOWN"
+
+```python
+df_coalesce = df.withColumn(
+    "name_clean",
+    coalesce(col("name"), lit("UNKNOWN"))
+)
+
+df_coalesce.show()
+```
+
+---
+
+## 6) nvl() concept
+Spark SQL has `nvl(col, value)`.
+
+In PySpark DataFrame API, we use:
+- coalesce()
+
+---
+
+## 7) Real DE Null Cleaning Pattern (Recommended)
+
+```python
+df_clean = df     .withColumn("name", coalesce(col("name"), lit("UNKNOWN")))     .withColumn("dept", coalesce(col("dept"), lit("UNKNOWN")))     .withColumn("salary", coalesce(col("salary"), lit(0)))
+
+df_clean.show()
+```
+
+---
+
+## 8) Summary
+
+- isNull()/isNotNull() filters nulls.
+- dropna() removes rows.
+- fillna() fills missing values.
+- replace() replaces values.
+- coalesce() is best for production null handling.
+- Null handling is mandatory in DE pipelines.
+
+---
+
+✅ Next Practical: `06_sort_limit_distinct.md`
