@@ -1,29 +1,17 @@
 📌 Step 14: Repartition, Coalesce, Partitioning
 
 File: 14_partitioning.md
-
+What is partition?
 repartition()
 
 coalesce()
 
 shuffle meaning
-
-partitionBy in write
-
-best practices
-
-===========================================================
-
-16. Partitioning Concepts
-
-What is partition?
-
-repartition()
-
-coalesce()
-
 shuffle partitions
 
+partitionBy in write
 partitionBy while writing
 
 best practices
+
+
