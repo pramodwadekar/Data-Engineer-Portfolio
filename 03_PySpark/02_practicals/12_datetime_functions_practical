@@ -1,0 +1,183 @@
+# 12 - Date & Time Functions (PySpark Practical)
+
+This practical covers:
+- current_date(), current_timestamp()
+- to_date(), to_timestamp()
+- date_add(), date_sub()
+- datediff()
+- months_between()
+- year(), month(), dayofmonth()
+- trunc()
+- real DE examples (ageing, last 7 days, monthly bucket)
+
+---
+
+## 0) Setup
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import (
+    col, current_date, current_timestamp,
+    to_date, to_timestamp,
+    date_add, date_sub,
+    datediff, months_between,
+    year, month, dayofmonth,
+    trunc, lit
+)
+
+spark = SparkSession.builder     .appName("DateTimeFunctionsPractical")     .master("local[*]")     .getOrCreate()
+```
+
+---
+
+## 1) Sample Data
+
+```python
+data = [
+    (1, "Pramod", "2026-02-01", "2026-02-01 10:15:30"),
+    (2, "Akash", "2026-01-15", "2026-01-15 09:05:10"),
+    (3, "Rahul", "2025-12-20", "2025-12-20 18:45:00"),
+]
+
+df = spark.createDataFrame(data, ["id", "name", "join_date_str", "event_ts_str"])
+df.show(truncate=False)
+```
+
+---
+
+## 2) current_date() and current_timestamp()
+
+```python
+df_now = df.withColumn("today", current_date())            .withColumn("now_ts", current_timestamp())
+
+df_now.show(truncate=False)
+```
+
+---
+
+## 3) Convert String to Date and Timestamp
+
+### 3.1 to_date()
+
+```python
+df2 = df.withColumn("join_date", to_date(col("join_date_str")))
+df2.show()
+df2.printSchema()
+```
+
+---
+
+### 3.2 to_timestamp()
+
+```python
+df3 = df2.withColumn("event_ts", to_timestamp(col("event_ts_str")))
+df3.show(truncate=False)
+df3.printSchema()
+```
+
+---
+
+## 4) date_add() and date_sub()
+
+Add 7 days:
+
+```python
+df_add = df3.withColumn("join_plus_7", date_add(col("join_date"), 7))
+df_add.show()
+```
+
+Subtract 30 days:
+
+```python
+df_sub = df3.withColumn("join_minus_30", date_sub(col("join_date"), 30))
+df_sub.show()
+```
+
+---
+
+## 5) datediff() (Most Used)
+
+Days difference between today and join_date:
+
+```python
+df_diff = df3.withColumn("days_since_join", datediff(current_date(), col("join_date")))
+df_diff.show()
+```
+
+---
+
+## 6) months_between()
+
+Months between today and join_date:
+
+```python
+df_months = df3.withColumn("months_since_join", months_between(current_date(), col("join_date")))
+df_months.show()
+```
+
+---
+
+## 7) Extract year, month, dayofmonth
+
+```python
+df_parts = df3     .withColumn("join_year", year(col("join_date")))     .withColumn("join_month", month(col("join_date")))     .withColumn("join_day", dayofmonth(col("join_date")))
+
+df_parts.show()
+```
+
+---
+
+## 8) trunc() (Monthly Bucketing)
+
+trunc(date, "month") gives first day of month.
+
+```python
+df_trunc = df3.withColumn("join_month_bucket", trunc(col("join_date"), "month"))
+df_trunc.show()
+```
+
+---
+
+## 9) Real DE Examples
+
+### 9.1 Filter last 30 days records
+(Example logic)
+
+```python
+df_last_30 = df3.filter(col("join_date") >= date_sub(current_date(), 30))
+df_last_30.show()
+```
+
+---
+
+### 9.2 Ageing Bucket (Days)
+Example: bucket based on days_since_join
+
+```python
+from pyspark.sql.functions import when
+
+df_age = df3.withColumn("days_since_join", datediff(current_date(), col("join_date")))     .withColumn(
+        "age_bucket",
+        when(col("days_since_join") <= 30, "0-30")
+        .when(col("days_since_join") <= 90, "31-90")
+        .otherwise("90+")
+    )
+
+df_age.show()
+```
+
+---
+
+## 10) Summary
+
+- current_date/current_timestamp gives system date/time.
+- to_date/to_timestamp converts string.
+- date_add/date_sub shifts dates.
+- datediff gives difference in days.
+- months_between gives difference in months.
+- year/month/dayofmonth extracts parts.
+- trunc is used for month buckets.
+
+---
+
+✅ Next Practical: `13_complex_datatypes_practical.md`
