@@ -12,21 +12,12 @@ trigger
 
 output modes
 
+streaming + delta
+
 kafka basics (if needed)
 
-========================================
 
-23. Structured Streaming (Optional but Pro)
 
-readStream/writeStream
-
-checkpointing
-
-triggers
-
-output modes
-
-streaming + delta
 
 
 
