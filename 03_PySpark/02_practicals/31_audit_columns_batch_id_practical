@@ -1,0 +1,115 @@
+# 31 - Audit Columns + Batch ID (Delta Practical) (Real DE Work)
+
+This practical covers:
+- Why audit columns are required
+- created_at, updated_at
+- load_date
+- batch_id
+- pipeline_run_id concept
+- best practices
+
+Audit columns are mandatory in real pipelines.
+
+---
+
+## 1) Why Audit Columns?
+
+Audit columns help you:
+✅ track when record was inserted  
+✅ track last update  
+✅ debug pipeline runs  
+✅ support incremental loads  
+✅ build monitoring  
+
+---
+
+## 2) Create Sample Source Data
+
+```python
+from pyspark.sql.functions import current_timestamp, lit, to_date
+
+batch_id = "batch_2026_02_07_01"
+load_date = "2026-02-07"
+
+data = [
+    (1, "Pramod", "IT", 50000),
+    (2, "Akash", "HR", 60000),
+    (3, "Rahul", "IT", 45000),
+]
+
+df = spark.createDataFrame(data, ["id", "name", "dept", "salary"])
+```
+
+---
+
+## 3) Add Audit Columns
+
+```python
+df_audit = df     .withColumn("created_at", current_timestamp())     .withColumn("updated_at", current_timestamp())     .withColumn("load_date", to_date(lit(load_date)))     .withColumn("batch_id", lit(batch_id))
+
+df_audit.show(truncate=False)
+df_audit.printSchema()
+```
+
+---
+
+## 4) Write to Delta Table
+
+```python
+delta_path = "/tmp/delta/audit/employees"
+
+df_audit.write.format("delta")     .mode("overwrite")     .partitionBy("load_date")     .save(delta_path)
+```
+
+---
+
+## 5) Incremental Batch Example (New Batch)
+
+```python
+batch_id2 = "batch_2026_02_08_01"
+load_date2 = "2026-02-08"
+
+data2 = [
+    (2, "Akash", "HR", 65000),  # update
+    (4, "Neha", "Finance", 70000)
+]
+
+df2 = spark.createDataFrame(data2, ["id", "name", "dept", "salary"])     .withColumn("created_at", current_timestamp())     .withColumn("updated_at", current_timestamp())     .withColumn("load_date", to_date(lit(load_date2)))     .withColumn("batch_id", lit(batch_id2))
+```
+
+Append:
+
+```python
+df2.write.format("delta")     .mode("append")     .partitionBy("load_date")     .save(delta_path)
+```
+
+---
+
+## 6) Validate
+
+```python
+spark.read.format("delta").load(delta_path).show(truncate=False)
+```
+
+---
+
+## 7) Best Practices
+
+✅ Always store batch_id in silver tables  
+✅ Keep created_at and updated_at  
+✅ Partition by load_date  
+✅ Use MERGE for updates  
+✅ Use batch_id for debugging and monitoring  
+
+---
+
+## 8) Summary
+
+- Audit columns are essential.
+- batch_id helps track pipeline run.
+- load_date supports partitioning.
+- created_at/updated_at supports history.
+
+---
+
+✅ Next Practical: `32_structured_streaming_file_source.md`
