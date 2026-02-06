@@ -1,0 +1,177 @@
+# 21 - AQE (Adaptive Query Execution) Practical (PySpark)
+
+This practical covers:
+- What is AQE
+- Why AQE is useful
+- Enabling AQE
+- Dynamic shuffle partition coalescing
+- Skew join handling
+- Join strategy changes (broadcast vs sort merge)
+- How to verify AQE using explain()
+
+AQE is a must topic in modern Spark (Spark 3+).
+
+---
+
+## 0) Setup
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, broadcast
+
+spark = SparkSession.builder     .appName("AQEPractical")     .master("local[*]")     .getOrCreate()
+```
+
+---
+
+## 1) Check AQE Settings
+
+```python
+spark.conf.get("spark.sql.adaptive.enabled")
+```
+
+---
+
+## 2) Enable AQE
+
+```python
+spark.conf.set("spark.sql.adaptive.enabled", "true")
+```
+
+---
+
+## 3) AQE Features (Important)
+
+### 3.1 Coalesce Shuffle Partitions
+Spark reduces number of shuffle partitions automatically.
+
+Enable:
+
+```python
+spark.conf.set("spark.sql.adaptive.coalescePartitions.enabled", "true")
+```
+
+---
+
+### 3.2 Skew Join Handling
+
+```python
+spark.conf.set("spark.sql.adaptive.skewJoin.enabled", "true")
+```
+
+---
+
+### 3.3 Local Shuffle Reader (Optimization)
+
+```python
+spark.conf.set("spark.sql.adaptive.localShuffleReader.enabled", "true")
+```
+
+---
+
+## 4) Demo: AQE Reduces Shuffle Partitions
+
+### 4.1 Create data
+
+```python
+data = [(i, "IT" if i % 2 == 0 else "HR", i * 10) for i in range(1, 500000)]
+df = spark.createDataFrame(data, ["id", "dept", "salary"])
+```
+
+---
+
+### 4.2 Set shuffle partitions high (to see AQE effect)
+
+```python
+spark.conf.set("spark.sql.shuffle.partitions", "200")
+spark.conf.get("spark.sql.shuffle.partitions")
+```
+
+---
+
+### 4.3 Run groupBy aggregation
+
+```python
+df_grouped = df.groupBy("dept").count()
+df_grouped.explain("formatted")
+df_grouped.show()
+```
+
+With AQE, Spark may reduce partitions at runtime.
+
+---
+
+## 5) Demo: AQE Skew Join Handling
+
+### 5.1 Create skewed fact table
+
+```python
+skew_data = []
+for i in range(1, 200001):
+    if i <= 160000:
+        skew_data.append((1, i * 10))
+    else:
+        skew_data.append((i, i * 10))
+
+fact = spark.createDataFrame(skew_data, ["key", "value"])
+```
+
+### 5.2 Create dimension table
+
+```python
+dim = spark.createDataFrame([(1, "VIP"), (2, "Normal")], ["key", "category"])
+```
+
+### 5.3 Join (with AQE)
+
+```python
+spark.conf.set("spark.sql.adaptive.enabled", "true")
+spark.conf.set("spark.sql.adaptive.skewJoin.enabled", "true")
+
+joined = fact.join(dim, "key", "left")
+joined.explain("formatted")
+joined.show(5)
+```
+
+Spark may split skew partitions automatically.
+
+---
+
+## 6) AQE Join Strategy Changes
+
+AQE can change join strategy at runtime.
+
+Example:
+- Spark may choose SortMergeJoin initially
+- After stats, it may switch to BroadcastHashJoin
+
+To force broadcast (for learning):
+
+```python
+joined_broadcast = fact.join(broadcast(dim), "key", "left")
+joined_broadcast.explain("formatted")
+```
+
+---
+
+## 7) Best Practices
+
+✅ Always enable AQE in Spark 3+  
+✅ AQE improves shuffle performance automatically  
+✅ AQE handles skew joins better  
+✅ Still apply manual optimizations when needed  
+✅ Verify with explain() + Spark UI  
+
+---
+
+## 8) Summary
+
+- AQE is runtime query optimization.
+- It reduces shuffle partitions dynamically.
+- It handles skew joins.
+- It can change join strategies.
+- Use explain("formatted") to verify.
+
+---
+
+✅ Next Practical: `22_delta_basic_read_write_practical.md`
