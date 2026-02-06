@@ -1,0 +1,121 @@
+# 25 - OPTIMIZE, ZORDER, VACUUM (Delta Practical) (Databricks Must)
+
+This practical covers:
+- small files problem
+- OPTIMIZE
+- ZORDER BY
+- VACUUM
+- when to use each
+- best practices
+
+---
+
+## 0) Setup
+
+Use Databricks.
+
+---
+
+## 1) Create Delta Table with Small Files
+
+Small files are created when:
+- you write many times in append
+- streaming writes micro-batches
+- too many partitions
+
+```python
+from pyspark.sql.functions import col
+
+df = spark.range(1, 500000)     .withColumn("dept_id", (col("id") % 10).cast("int"))     .withColumn("salary", (col("id") * 10).cast("int"))
+
+delta_path = "/tmp/delta/employees_optimize"
+
+df.repartition(200).write.format("delta")     .mode("overwrite")     .partitionBy("dept_id")     .save(delta_path)
+```
+
+---
+
+## 2) Create External Delta Table
+
+```python
+spark.sql(f"""
+CREATE TABLE IF NOT EXISTS de_portfolio.employees_optimize
+USING DELTA
+LOCATION '{delta_path}'
+""")
+```
+
+---
+
+## 3) Small Files Problem
+
+If there are many files:
+- Spark reads too many files
+- query becomes slow
+
+---
+
+## 4) OPTIMIZE
+
+OPTIMIZE compacts small files into bigger files.
+
+```python
+spark.sql("OPTIMIZE de_portfolio.employees_optimize")
+```
+
+---
+
+## 5) ZORDER BY
+
+ZORDER improves performance for filter queries.
+
+Example: queries filter on salary
+
+```python
+spark.sql("OPTIMIZE de_portfolio.employees_optimize ZORDER BY (salary)")
+```
+
+---
+
+## 6) VACUUM
+
+VACUUM removes old files not needed for time travel.
+
+Default retention = 7 days (168 hours).
+
+```python
+spark.sql("VACUUM de_portfolio.employees_optimize")
+```
+
+---
+
+## 7) Change Retention (Not recommended in prod without care)
+
+```python
+spark.sql("VACUUM de_portfolio.employees_optimize RETAIN 24 HOURS")
+```
+
+⚠️ Do this only if your org policy allows.
+
+---
+
+## 8) Best Practices
+
+✅ Run OPTIMIZE daily/weekly for large tables  
+✅ Use ZORDER on frequently filtered columns  
+✅ Avoid too many partitions  
+✅ Use VACUUM carefully (time travel requirement)  
+✅ Use auto optimize in Databricks if available  
+
+---
+
+## 9) Summary
+
+- OPTIMIZE compacts small files.
+- ZORDER improves pruning and query speed.
+- VACUUM removes old unused files.
+- These are core Delta Lake optimizations.
+
+---
+
+✅ Next Practical: `26_bronze_to_silver_pipeline_practical.md`
