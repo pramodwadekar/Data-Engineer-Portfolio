@@ -1,0 +1,132 @@
+# 06 - sort(), orderBy(), limit(), distinct() (PySpark Practical)
+
+This practical covers:
+- distinct()
+- dropDuplicates()
+- sort() / orderBy()
+- ascending / descending
+- multiple column sorting
+- limit()
+- top N pattern (very common in DE)
+
+---
+
+## 0) Setup
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col
+
+spark = SparkSession.builder     .appName("SortLimitDistinct")     .master("local[*]")     .getOrCreate()
+
+data = [
+    (1, "Pramod", "IT", 50000),
+    (2, "Akash", "HR", 60000),
+    (3, "Rahul", "IT", 45000),
+    (4, "Neha", "Finance", 70000),
+    (5, "Om", "HR", 40000),
+    (6, "Om", "HR", 40000)   # duplicate row
+]
+
+df = spark.createDataFrame(data, ["id", "name", "dept", "salary"])
+df.show()
+```
+
+---
+
+## 1) distinct()
+
+distinct removes duplicate rows.
+
+```python
+df.distinct().show()
+```
+
+---
+
+## 2) dropDuplicates()
+
+### 2.1 Drop duplicate rows (same as distinct)
+
+```python
+df.dropDuplicates().show()
+```
+
+---
+
+### 2.2 Drop duplicates based on subset of columns
+Example: Keep unique name + dept
+
+```python
+df.dropDuplicates(["name", "dept"]).show()
+```
+
+---
+
+## 3) orderBy() / sort()
+
+### 3.1 Ascending sort (default)
+
+```python
+df.orderBy("salary").show()
+```
+
+---
+
+### 3.2 Descending sort
+
+```python
+df.orderBy(col("salary").desc()).show()
+```
+
+---
+
+### 3.3 Sort by multiple columns
+Sort by dept asc and salary desc
+
+```python
+df.orderBy(col("dept").asc(), col("salary").desc()).show()
+```
+
+---
+
+### 3.4 sort() is same as orderBy()
+
+```python
+df.sort(col("salary").desc()).show()
+```
+
+---
+
+## 4) limit()
+
+Returns first N rows.
+
+```python
+df.limit(3).show()
+```
+
+---
+
+## 5) Top N Pattern (Most Used)
+
+Top 3 highest salary:
+
+```python
+df.orderBy(col("salary").desc()).limit(3).show()
+```
+
+---
+
+## 6) Summary
+
+- distinct() removes duplicate rows.
+- dropDuplicates() removes duplicates (can use subset).
+- orderBy() and sort() are same.
+- Use desc() for descending.
+- limit() gives first N rows.
+- Always sort before limit for top N.
+
+---
+
+✅ Next Practical: `07_column_functions_practical.md`
