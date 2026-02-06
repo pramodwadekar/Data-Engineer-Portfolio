@@ -1,0 +1,183 @@
+# 11 - Window Functions (Advanced + Must) (PySpark Practical)
+
+This practical covers:
+- row_number()
+- rank(), dense_rank()
+- lag(), lead()
+- running sum
+- partitionBy + orderBy
+- real examples: latest record, top N per group
+
+Window functions are extremely important in real DE projects.
+
+---
+
+## 0) Setup
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, row_number, rank, dense_rank, lag, lead, sum
+from pyspark.sql.window import Window
+
+spark = SparkSession.builder     .appName("WindowFunctions")     .master("local[*]")     .getOrCreate()
+```
+
+Sample dataset:
+
+```python
+data = [
+    (1, "IT", "2026-02-01", 50000),
+    (1, "IT", "2026-02-05", 55000),
+    (2, "HR", "2026-02-02", 60000),
+    (2, "HR", "2026-02-06", 62000),
+    (3, "Finance", "2026-02-03", 70000),
+    (3, "Finance", "2026-02-04", 71000),
+    (3, "Finance", "2026-02-07", 72000),
+]
+
+df = spark.createDataFrame(data, ["emp_id", "dept", "event_date", "salary"])
+df.show()
+```
+
+Convert date string to date:
+
+```python
+from pyspark.sql.functions import to_date
+
+df = df.withColumn("event_date", to_date(col("event_date")))
+df.show()
+```
+
+---
+
+## 1) row_number() (Most Used)
+
+Window spec:
+
+```python
+w = Window.partitionBy("emp_id").orderBy(col("event_date").desc())
+```
+
+Add row_number:
+
+```python
+df_rn = df.withColumn("rn", row_number().over(w))
+df_rn.show()
+```
+
+---
+
+## 2) Latest Record per Employee (Real Use)
+
+```python
+latest_df = df_rn.filter(col("rn") == 1).drop("rn")
+latest_df.show()
+```
+
+---
+
+## 3) rank() vs dense_rank()
+
+Window by dept salary desc:
+
+```python
+w2 = Window.partitionBy("dept").orderBy(col("salary").desc())
+```
+
+### 3.1 rank()
+
+```python
+df_rank = df.withColumn("rank", rank().over(w2))
+df_rank.show()
+```
+
+rank() behavior:
+- ties get same rank
+- next rank is skipped
+
+---
+
+### 3.2 dense_rank()
+
+```python
+df_dense = df.withColumn("dense_rank", dense_rank().over(w2))
+df_dense.show()
+```
+
+dense_rank behavior:
+- ties get same rank
+- next rank is NOT skipped
+
+---
+
+## 4) Top N per Group (Most Asked)
+
+Example: top 2 salary records per dept
+
+```python
+df_top2 = df.withColumn("dr", dense_rank().over(w2))             .filter(col("dr") <= 2)             .drop("dr")
+
+df_top2.show()
+```
+
+---
+
+## 5) lag() and lead()
+
+Window by emp_id order by date:
+
+```python
+w3 = Window.partitionBy("emp_id").orderBy("event_date")
+```
+
+### 5.1 lag() (previous row)
+
+```python
+df_lag = df.withColumn("prev_salary", lag("salary", 1).over(w3))
+df_lag.show()
+```
+
+---
+
+### 5.2 lead() (next row)
+
+```python
+df_lead = df.withColumn("next_salary", lead("salary", 1).over(w3))
+df_lead.show()
+```
+
+---
+
+## 6) Running Sum (Cumulative Sum)
+
+Running sum by emp_id:
+
+```python
+w4 = Window.partitionBy("emp_id")     .orderBy("event_date")     .rowsBetween(Window.unboundedPreceding, Window.currentRow)
+
+df_run = df.withColumn("running_salary_sum", sum("salary").over(w4))
+df_run.show()
+```
+
+---
+
+## 7) Best Practices
+
+✅ Use row_number for latest record  
+✅ Use dense_rank for Top N per group  
+✅ Always define window spec clearly  
+✅ Avoid unnecessary window operations on huge datasets  
+✅ Combine with partitioning for performance  
+
+---
+
+## 8) Summary
+
+- row_number() gives unique numbering.
+- rank() skips ranks after ties.
+- dense_rank() does not skip.
+- lag/lead gives previous/next row.
+- running sum uses rowsBetween.
+
+---
+
