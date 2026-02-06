@@ -1,0 +1,7 @@
+-- 04_stream_triggers.sql
+-- Notes:
+-- You can use processingTime trigger in notebooks:
+-- .trigger(processingTime="10 seconds")
+--
+-- availableNow is Databricks:
+-- .trigger(availableNow=True)
