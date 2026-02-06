@@ -1,0 +1,103 @@
+# 32 - Structured Streaming (File Source) Practical (Optional but Powerful)
+
+This practical covers:
+- What is Structured Streaming
+- readStream from file source
+- schema requirement
+- checkpointing basics (intro)
+- append mode
+- real use case: ingest JSON events
+
+Structured Streaming is important for modern DE.
+
+---
+
+## 0) Important Note
+
+Structured streaming needs:
+- a directory where new files arrive continuously
+- Spark reads them incrementally
+
+Best tested in Databricks.
+
+---
+
+## 1) Define Schema (Mandatory)
+
+Streaming requires schema (no inferSchema in streaming).
+
+```python
+from pyspark.sql.types import StructType, StructField, IntegerType, StringType, TimestampType
+
+schema = StructType([
+    StructField("event_id", IntegerType(), True),
+    StructField("user_id", IntegerType(), True),
+    StructField("event_type", StringType(), True),
+    StructField("event_time", TimestampType(), True)
+])
+```
+
+---
+
+## 2) readStream from JSON folder
+
+```python
+input_path = "/tmp/stream/input/events_json"
+
+stream_df = spark.readStream     .schema(schema)     .json(input_path)
+```
+
+---
+
+## 3) Basic Transformations on Streaming DF
+
+```python
+from pyspark.sql.functions import col
+
+filtered_df = stream_df.filter(col("event_type") == "LOGIN")
+```
+
+---
+
+## 4) writeStream to Console (Testing)
+
+```python
+query = filtered_df.writeStream     .format("console")     .outputMode("append")     .start()
+```
+
+---
+
+## 5) Stop Streaming
+
+```python
+query.stop()
+```
+
+---
+
+## 6) Real Use Case
+Instead of console, you write to:
+- Delta tables
+- Kafka
+- memory sink (testing)
+
+---
+
+## 7) Best Practices
+
+✅ Always define schema  
+✅ Always use checkpointing for production  
+✅ Use Delta sink for reliability  
+✅ Avoid heavy transformations without tuning  
+
+---
+
+## 8) Summary
+
+- readStream reads incrementally.
+- Streaming requires schema.
+- writeStream outputs continuously.
+
+---
+
+✅ Next Practical: `33_streaming_delta_sink_checkpoint.md`
