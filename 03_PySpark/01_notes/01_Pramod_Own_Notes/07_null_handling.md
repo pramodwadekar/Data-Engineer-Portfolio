@@ -12,16 +12,4 @@ isNull(), isNotNull()
 
 coalesce(), nvl()
 
-=================================================
 
-07. Null Handling (Real Work)
-
-isNull, isNotNull
-
-dropna
-
-fillna
-
-replace
-
-coalesce / nvl
