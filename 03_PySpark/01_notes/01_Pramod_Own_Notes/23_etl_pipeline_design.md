@@ -12,17 +12,3 @@ idempotency
 
 audit columns (created_at, updated_at)
 
-=======================================
-
-
-22. ETL Pipeline Design with PySpark
-
-ingestion → transformation → load
-
-incremental load
-
-idempotency
-
-audit columns
-
-schema evolution
