@@ -1,0 +1,127 @@
+# 02 - Create DataFrame (All Ways) (PySpark Practical)
+
+This practical covers creating DataFrames using:
+- list of tuples
+- list of dicts
+- schema (manual)
+- RDD
+- file (CSV/JSON/Parquet)
+- range()
+
+---
+
+## 0) Setup SparkSession
+
+```python
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder     .appName("CreateDataFrameAllWays")     .master("local[*]")     .getOrCreate()
+```
+
+---
+
+## 1) Create DataFrame using List of Tuples (Most Common)
+
+```python
+data = [
+    (1, "Pramod", "IT", 50000),
+    (2, "Akash", "HR", 60000),
+    (3, "Rahul", "IT", 45000)
+]
+
+df = spark.createDataFrame(data, ["id", "name", "dept", "salary"])
+df.show()
+```
+
+---
+
+## 2) Create DataFrame using List of Dicts
+
+```python
+data_dict = [
+    {"id": 1, "name": "Pramod", "dept": "IT", "salary": 50000},
+    {"id": 2, "name": "Akash", "dept": "HR", "salary": 60000},
+    {"id": 3, "name": "Rahul", "dept": "IT", "salary": 45000},
+]
+
+df2 = spark.createDataFrame(data_dict)
+df2.show()
+```
+
+---
+
+## 3) Create DataFrame with Manual Schema (Best Practice)
+
+Why manual schema?
+- avoids wrong inference
+- avoids performance issues
+- ensures correct types
+
+```python
+from pyspark.sql.types import StructType, StructField, IntegerType, StringType
+
+schema = StructType([
+    StructField("id", IntegerType(), True),
+    StructField("name", StringType(), True),
+    StructField("dept", StringType(), True),
+    StructField("salary", IntegerType(), True)
+])
+
+df3 = spark.createDataFrame(data, schema=schema)
+df3.printSchema()
+df3.show()
+```
+
+---
+
+## 4) Create DataFrame from RDD (Interview Topic)
+
+```python
+rdd = spark.sparkContext.parallelize(data)
+df4 = spark.createDataFrame(rdd, ["id", "name", "dept", "salary"])
+df4.show()
+```
+
+---
+
+## 5) Create DataFrame using spark.range()
+
+This is useful for generating sample data quickly.
+
+```python
+df_range = spark.range(1, 11)  # 1 to 10
+df_range.show()
+```
+
+---
+
+## 6) Create DataFrame from Files (Quick Demo)
+
+### 6.1 CSV
+```python
+df_csv = spark.read.option("header", "true").csv("data/employees.csv")
+```
+
+### 6.2 JSON
+```python
+df_json = spark.read.json("data/employees.json")
+```
+
+### 6.3 Parquet
+```python
+df_parquet = spark.read.parquet("data/employees.parquet")
+```
+
+---
+
+## 7) Summary
+
+- Most common = list of tuples + column names
+- Best practice = manual schema using StructType
+- RDD creation is mostly interview only
+- spark.range() is great for quick test data
+- Reading from files is real-world ingestion
+
+---
+
+✅ Next Practical: `03_select_withcolumn_drop.md`
