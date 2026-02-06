@@ -1,0 +1,176 @@
+# 38 - SCD Type 1 and Type 2 (Delta MERGE) Practical (Advanced + Must)
+
+This practical covers:
+- What is SCD
+- SCD Type 1 (overwrite)
+- SCD Type 2 (history)
+- Delta MERGE for SCD
+- Real DE interview topic
+
+SCD is VERY important for Data Warehouse + Lakehouse.
+
+---
+
+## 1) What is SCD?
+
+SCD = Slowly Changing Dimension
+
+Used for dimension tables:
+- customer
+- employee
+- product
+
+---
+
+## 2) SCD Type 1 (No History)
+
+If customer address changes:
+- update row
+- old value is lost
+
+---
+
+### 2.1 Create Target Table
+
+```python
+target_path = "/tmp/delta/scd/type1/customers"
+
+target_data = [
+    (1, "Pramod", "Pune"),
+    (2, "Akash", "Mumbai")
+]
+
+df_target = spark.createDataFrame(target_data, ["cust_id", "name", "city"])
+
+df_target.write.format("delta").mode("overwrite").save(target_path)
+```
+
+---
+
+### 2.2 New Batch (Updates)
+
+```python
+source_data = [
+    (1, "Pramod", "Bangalore"),  # city changed
+    (3, "Rahul", "Delhi")        # new customer
+]
+
+df_source = spark.createDataFrame(source_data, ["cust_id", "name", "city"])
+df_source.createOrReplaceTempView("source_customers")
+```
+
+---
+
+### 2.3 MERGE (Type 1)
+
+```python
+spark.sql(f"""
+MERGE INTO delta.`{target_path}` t
+USING source_customers s
+ON t.cust_id = s.cust_id
+WHEN MATCHED THEN UPDATE SET *
+WHEN NOT MATCHED THEN INSERT *
+""")
+```
+
+Verify:
+
+```python
+spark.read.format("delta").load(target_path).show()
+```
+
+---
+
+## 3) SCD Type 2 (With History)
+
+Type 2 means:
+- keep old row as inactive
+- insert new row as active
+
+Common columns:
+- start_date
+- end_date
+- is_current
+
+---
+
+### 3.1 Create Target Type2 Table
+
+```python
+from pyspark.sql.functions import lit, to_date, current_date
+
+target_path2 = "/tmp/delta/scd/type2/customers"
+
+data = [
+    (1, "Pramod", "Pune", "2026-01-01", None, True),
+    (2, "Akash", "Mumbai", "2026-01-01", None, True)
+]
+
+df_t2 = spark.createDataFrame(
+    data,
+    ["cust_id", "name", "city", "start_date", "end_date", "is_current"]
+).withColumn("start_date", to_date(col("start_date")))  .withColumn("end_date", to_date(col("end_date")))
+
+df_t2.write.format("delta").mode("overwrite").save(target_path2)
+```
+
+---
+
+### 3.2 Source Batch (Change city for cust_id=1)
+
+```python
+source2 = [
+    (1, "Pramod", "Bangalore"),
+    (3, "Rahul", "Delhi")
+]
+
+df_s2 = spark.createDataFrame(source2, ["cust_id", "name", "city"])
+df_s2.createOrReplaceTempView("source_t2")
+```
+
+---
+
+### 3.3 Step 1: Expire old records (set is_current=false)
+
+```python
+spark.sql(f"""
+MERGE INTO delta.`{target_path2}` t
+USING source_t2 s
+ON t.cust_id = s.cust_id AND t.is_current = true
+WHEN MATCHED AND t.city <> s.city THEN UPDATE SET
+  t.end_date = current_date(),
+  t.is_current = false
+""")
+```
+
+---
+
+### 3.4 Step 2: Insert new current records
+
+```python
+from pyspark.sql.functions import current_date
+
+df_new = df_s2.withColumn("start_date", current_date())     .withColumn("end_date", lit(None).cast("date"))     .withColumn("is_current", lit(True))
+
+df_new.write.format("delta").mode("append").save(target_path2)
+```
+
+---
+
+### 3.5 Verify Type 2 Output
+
+```python
+spark.read.format("delta").load(target_path2)     .orderBy("cust_id", "start_date")     .show(truncate=False)
+```
+
+---
+
+## 4) Summary
+
+- SCD Type 1 overwrites values (no history).
+- SCD Type 2 keeps history with start/end dates.
+- Type 2 is a very common interview + project topic.
+
+---
+
+✅ Next Practical: `39_bad_records_quarantine_practical.md`
