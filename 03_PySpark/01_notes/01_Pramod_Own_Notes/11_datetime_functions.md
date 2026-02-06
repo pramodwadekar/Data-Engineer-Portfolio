@@ -10,19 +10,6 @@ datediff
 
 to_date, to_timestamp
 
-year, month, dayofmonth
-
-trunc
-
-
-=======================================================
-
-11. Date & Time Functions
-
-current_date/current_timestamp
-
-to_date/to_timestamp
-
 datediff, months_between
 
 date_add, date_sub
@@ -30,3 +17,5 @@ date_add, date_sub
 year, month, dayofmonth
 
 trunc
+
+
