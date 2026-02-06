@@ -1,0 +1,147 @@
+# 15 - Spark SQL Practical (PySpark)
+
+This practical covers:
+- createOrReplaceTempView()
+- SQL queries (select, filter, join, groupBy)
+- Spark SQL vs DataFrame API
+- best practices
+
+Spark SQL is used daily in Data Engineering.
+
+---
+
+## 0) Setup
+
+```python
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder     .appName("SparkSQLPractical")     .master("local[*]")     .getOrCreate()
+```
+
+---
+
+## 1) Create Sample DataFrames
+
+Employees:
+
+```python
+employees = [
+    (1, "Pramod", 101, 50000),
+    (2, "Akash", 102, 60000),
+    (3, "Rahul", 101, 45000),
+    (4, "Neha", 103, 70000),
+    (5, "Om", 102, 40000)
+]
+
+emp_df = spark.createDataFrame(employees, ["emp_id", "name", "dept_id", "salary"])
+emp_df.show()
+```
+
+Departments:
+
+```python
+departments = [
+    (101, "IT"),
+    (102, "HR"),
+    (103, "Finance")
+]
+
+dept_df = spark.createDataFrame(departments, ["dept_id", "dept_name"])
+dept_df.show()
+```
+
+---
+
+## 2) createOrReplaceTempView()
+
+```python
+emp_df.createOrReplaceTempView("employees")
+dept_df.createOrReplaceTempView("departments")
+```
+
+---
+
+## 3) Basic SQL Queries
+
+### 3.1 Select
+
+```python
+spark.sql("SELECT * FROM employees").show()
+```
+
+---
+
+### 3.2 Filter
+
+```python
+spark.sql("SELECT * FROM employees WHERE salary > 50000").show()
+```
+
+---
+
+### 3.3 Order By + Limit
+
+```python
+spark.sql("SELECT name, salary FROM employees ORDER BY salary DESC LIMIT 3").show()
+```
+
+---
+
+## 4) Aggregation SQL
+
+```python
+spark.sql("""
+SELECT dept_id,
+       COUNT(*) AS emp_count,
+       AVG(salary) AS avg_salary
+FROM employees
+GROUP BY dept_id
+""").show()
+```
+
+---
+
+## 5) Join using Spark SQL
+
+```python
+spark.sql("""
+SELECT e.emp_id, e.name, d.dept_name, e.salary
+FROM employees e
+JOIN departments d
+ON e.dept_id = d.dept_id
+""").show()
+```
+
+---
+
+## 6) Spark SQL vs DataFrame API
+
+### 6.1 Same join using DataFrame API
+
+```python
+from pyspark.sql.functions import col
+
+emp_df.join(dept_df, "dept_id", "inner")       .select("emp_id", "name", "dept_name", "salary")       .show()
+```
+
+---
+
+## 7) Best Practices
+
+✅ Use SQL for readability when logic is SQL-heavy  
+✅ Avoid SELECT * in production  
+✅ Use views for step-wise transformations  
+✅ Use Delta tables for storage in Databricks  
+✅ Use explain() for performance debugging  
+
+---
+
+## 8) Summary
+
+- createOrReplaceTempView makes DataFrame queryable in SQL.
+- spark.sql runs SQL queries.
+- Spark SQL and DataFrame API both optimized by Catalyst.
+
+---
+
+✅ Next Practical: `16_partitioning_repartition_coalesce_practical.md`
