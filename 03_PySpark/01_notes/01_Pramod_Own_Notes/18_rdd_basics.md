@@ -10,12 +10,4 @@ map, flatMap, reduceByKey
 
 when RDD is used (rare)
 
-==========================================
-
-24. RDD Basics (Only for Interview)
-
-what is RDD
-
-map, flatMap, reduceByKey
-
 why RDD is avoided now
