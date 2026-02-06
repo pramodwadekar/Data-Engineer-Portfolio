@@ -1,0 +1,114 @@
+# 28 - Incremental Load (Delta) Practical (Real DE Work)
+
+This practical covers:
+- What is incremental load
+- Batch ID concept
+- MERGE pattern for incremental loads
+- Insert + update logic
+- Idempotency concept (intro)
+- Best practices
+
+Incremental load is one of the most important real DE topics.
+
+---
+
+## 0) Setup
+
+We will maintain a Silver table and apply new batch incrementally.
+
+---
+
+## 1) Create Initial Silver Table (Target)
+
+```python
+from pyspark.sql.functions import current_timestamp
+
+target_data = [
+    (1, "PRAMOD", "IT", 50000),
+    (2, "AKASH", "HR", 60000),
+    (3, "RAHUL", "IT", 45000),
+]
+
+target_df = spark.createDataFrame(target_data, ["id", "name", "dept", "salary"])
+
+silver_path = "/tmp/delta/silver/employees_incremental"
+
+target_df = target_df     .withColumn("created_at", current_timestamp())     .withColumn("updated_at", current_timestamp())
+
+target_df.write.format("delta").mode("overwrite").save(silver_path)
+```
+
+---
+
+## 2) New Batch Data (Source)
+
+This batch contains:
+- update id=2 salary
+- insert id=4
+
+```python
+source_data = [
+    (2, "AKASH", "HR", 65000),
+    (4, "NEHA", "FINANCE", 70000)
+]
+
+source_df = spark.createDataFrame(source_data, ["id", "name", "dept", "salary"])
+```
+
+---
+
+## 3) MERGE for Incremental Load
+
+```python
+source_df.createOrReplaceTempView("source_emp")
+
+spark.sql(f"""
+MERGE INTO delta.`{silver_path}` AS t
+USING source_emp AS s
+ON t.id = s.id
+WHEN MATCHED THEN UPDATE SET
+  t.name = s.name,
+  t.dept = s.dept,
+  t.salary = s.salary,
+  t.updated_at = current_timestamp()
+WHEN NOT MATCHED THEN INSERT (
+  id, name, dept, salary, created_at, updated_at
+) VALUES (
+  s.id, s.name, s.dept, s.salary, current_timestamp(), current_timestamp()
+)
+""")
+```
+
+---
+
+## 4) Validate Output
+
+```python
+spark.read.format("delta").load(silver_path).show(truncate=False)
+```
+
+Expected:
+- id=2 salary updated
+- id=4 inserted
+
+---
+
+## 5) Best Practices
+
+✅ Always use MERGE for incremental updates  
+✅ Maintain created_at and updated_at  
+✅ Use a primary key for merge condition  
+✅ Track batch_id in real pipelines  
+✅ Use deduplication before merge  
+
+---
+
+## 6) Summary
+
+- Incremental load updates existing rows and inserts new rows.
+- MERGE is standard approach in Delta.
+- Audit columns are important.
+
+---
+
+✅ Next Practical: `29_schema_evolution_practical.md`
