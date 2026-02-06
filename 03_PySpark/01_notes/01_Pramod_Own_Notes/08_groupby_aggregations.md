@@ -10,16 +10,8 @@ countDistinct
 
 agg()
 
+having equivalent
+
 having-like filter using filter after aggregation
 
-=====================================================
 
-08. Aggregations + GroupBy
-
-groupBy + count/sum/avg
-
-agg()
-
-countDistinct
-
-having equivalent
