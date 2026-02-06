@@ -1,0 +1,135 @@
+# 18 - explain() and Execution Plan (PySpark Practical)
+
+This practical covers:
+- Why explain() is important
+- explain()
+- explain("formatted")
+- Understanding: logical plan vs physical plan
+- Detecting shuffle and joins
+- Best practices
+
+This is a MUST practical for performance tuning.
+
+---
+
+## 0) Setup
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, avg
+
+spark = SparkSession.builder     .appName("ExplainExecutionPlan")     .master("local[*]")     .getOrCreate()
+```
+
+---
+
+## 1) Sample Data
+
+```python
+data = [(i, "IT" if i % 2 == 0 else "HR", i * 1000) for i in range(1, 101)]
+df = spark.createDataFrame(data, ["id", "dept", "salary"])
+df.show(5)
+```
+
+---
+
+## 2) Simple Transformation
+
+```python
+df2 = df.filter(col("salary") > 50000)         .groupBy("dept")         .agg(avg("salary").alias("avg_salary"))
+```
+
+---
+
+## 3) explain()
+
+```python
+df2.explain()
+```
+
+You will see:
+- logical plan
+- optimized plan
+- physical plan
+
+---
+
+## 4) explain("formatted") (Recommended)
+
+```python
+df2.explain("formatted")
+```
+
+This output is easier to read.
+
+---
+
+## 5) What to Look for in explain()
+
+### 5.1 Filter Pushdown
+Check if filter happens early.
+
+### 5.2 Exchange (Shuffle)
+If you see:
+- Exchange
+It means shuffle is happening.
+
+groupBy and join always create shuffle.
+
+### 5.3 Join Type
+For joins, Spark shows:
+- BroadcastHashJoin (best)
+- SortMergeJoin (shuffle heavy)
+- ShuffleHashJoin
+
+---
+
+## 6) Join Example with explain()
+
+```python
+big = spark.range(1, 100000).withColumnRenamed("id", "key")
+small = spark.range(1, 100).withColumnRenamed("id", "key")
+
+join_df = big.join(small, "key")
+join_df.explain("formatted")
+```
+
+Spark might choose broadcast join automatically for small.
+
+---
+
+## 7) Force Broadcast Join
+
+```python
+from pyspark.sql.functions import broadcast
+
+join_broadcast = big.join(broadcast(small), "key")
+join_broadcast.explain("formatted")
+```
+
+Look for:
+- BroadcastHashJoin
+
+---
+
+## 8) Best Practices
+
+✅ Use explain() when job is slow  
+✅ Detect Exchange (shuffle) operations  
+✅ Verify broadcast join is used when expected  
+✅ Use explain("formatted") for readability  
+✅ Combine with Spark UI for deep analysis  
+
+---
+
+## 9) Summary
+
+- explain() shows execution plan.
+- formatted explain is easier.
+- Exchange = shuffle.
+- BroadcastHashJoin = best join.
+- SortMergeJoin = heavy join.
+
+---
+
+✅ Next Practical: `19_broadcast_join_practical.md`
