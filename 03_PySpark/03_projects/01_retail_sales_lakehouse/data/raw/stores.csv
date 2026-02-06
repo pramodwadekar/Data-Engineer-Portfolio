@@ -1,0 +1,11 @@
+store_id,store_name,city,region
+1,Store_1,Pune,West
+2,Store_2,Pune,West
+3,Store_3,Pune,South
+4,Store_4,Bangalore,North
+5,Store_5,Pune,West
+6,Store_6,Pune,North
+7,Store_7,Delhi,North
+8,Store_8,Mumbai,North
+9,Store_9,Bangalore,West
+10,Store_10,Bangalore,North
