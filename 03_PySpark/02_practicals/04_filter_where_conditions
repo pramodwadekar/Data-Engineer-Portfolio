@@ -1,0 +1,120 @@
+# 04 - filter() / where() with Conditions (PySpark Practical)
+
+This practical covers:
+- filter() and where()
+- multiple conditions (AND/OR)
+- isin()
+- between()
+- like()
+- startswith/endswith
+- SQL expression filters
+
+---
+
+## 0) Setup
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col
+
+spark = SparkSession.builder     .appName("FilterWhereConditions")     .master("local[*]")     .getOrCreate()
+
+data = [
+    (1, "Pramod", "IT", 50000),
+    (2, "Akash", "HR", 60000),
+    (3, "Rahul", "IT", 45000),
+    (4, "Neha", "Finance", 70000),
+    (5, "Om", "HR", 40000)
+]
+
+df = spark.createDataFrame(data, ["id", "name", "dept", "salary"])
+df.show()
+```
+
+---
+
+## 1) filter() (Most Common)
+
+```python
+df.filter(col("dept") == "IT").show()
+```
+
+---
+
+## 2) where() (Same as filter)
+
+```python
+df.where(col("salary") > 50000).show()
+```
+
+---
+
+## 3) Multiple Conditions (AND)
+
+```python
+df.filter((col("dept") == "HR") & (col("salary") > 45000)).show()
+```
+
+---
+
+## 4) Multiple Conditions (OR)
+
+```python
+df.filter((col("dept") == "IT") | (col("dept") == "Finance")).show()
+```
+
+---
+
+## 5) isin()
+
+```python
+df.filter(col("dept").isin("IT", "HR")).show()
+```
+
+---
+
+## 6) between()
+
+```python
+df.filter(col("salary").between(45000, 65000)).show()
+```
+
+---
+
+## 7) like() (SQL pattern)
+
+```python
+df.filter(col("name").like("P%")).show()
+```
+
+---
+
+## 8) startswith() and endswith()
+
+```python
+df.filter(col("name").startswith("A")).show()
+df.filter(col("name").endswith("l")).show()
+```
+
+---
+
+## 9) SQL Expression Filter
+
+```python
+df.filter("dept = 'IT' AND salary >= 45000").show()
+```
+
+---
+
+## 10) Summary
+
+- filter() and where() are same.
+- Use & for AND, | for OR (always use brackets).
+- isin() checks membership.
+- between() checks range.
+- like() supports SQL patterns.
+- You can also pass SQL string in filter().
+
+---
+
+✅ Next Practical: `05_null_handling_practical.md`
