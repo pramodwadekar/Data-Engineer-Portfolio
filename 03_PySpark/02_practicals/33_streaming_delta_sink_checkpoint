@@ -1,0 +1,114 @@
+# 33 - Streaming → Delta Sink + Checkpointing (Structured Streaming Practical)
+
+This practical covers:
+- writeStream to Delta
+- checkpointing (most important)
+- append mode
+- exactly-once concept in Delta
+- streaming table validation
+
+This is a real production pattern in Databricks.
+
+---
+
+## 0) Important Notes
+
+- Best tested in Databricks
+- Delta sink is reliable for streaming
+- Checkpointing is mandatory in production
+
+---
+
+## 1) Define Schema
+
+```python
+from pyspark.sql.types import StructType, StructField, IntegerType, StringType, TimestampType
+
+schema = StructType([
+    StructField("event_id", IntegerType(), True),
+    StructField("user_id", IntegerType(), True),
+    StructField("event_type", StringType(), True),
+    StructField("event_time", TimestampType(), True)
+])
+```
+
+---
+
+## 2) Read Stream from JSON Folder
+
+```python
+input_path = "/tmp/stream/input/events_json"
+
+stream_df = spark.readStream     .schema(schema)     .json(input_path)
+```
+
+---
+
+## 3) Write Stream to Delta Table
+
+```python
+delta_path = "/tmp/delta/streaming/events"
+checkpoint_path = "/tmp/delta/streaming/checkpoints/events"
+
+query = stream_df.writeStream     .format("delta")     .outputMode("append")     .option("checkpointLocation", checkpoint_path)     .start(delta_path)
+```
+
+---
+
+## 4) Read Delta Table (Streaming Output)
+
+```python
+df_delta = spark.read.format("delta").load(delta_path)
+df_delta.show(truncate=False)
+```
+
+---
+
+## 5) Why Checkpointing is Mandatory?
+
+Checkpoint stores:
+- progress (offsets)
+- metadata
+- state
+
+If streaming job restarts:
+✅ it continues from last checkpoint  
+❌ without checkpoint, it reprocesses from start  
+
+---
+
+## 6) Exactly Once Concept (Delta)
+
+Delta sink + checkpoint provides:
+- fault tolerance
+- consistent writes
+- prevents duplicates during restart (in most cases)
+
+---
+
+## 7) Stop Streaming
+
+```python
+query.stop()
+```
+
+---
+
+## 8) Best Practices
+
+✅ Always use checkpointLocation  
+✅ Keep checkpoint in stable storage (DBFS/ADLS)  
+✅ Use Delta sink for reliability  
+✅ Monitor streaming job and late data  
+
+---
+
+## 9) Summary
+
+- Streaming + Delta is best production combo.
+- checkpointing ensures fault tolerance.
+- append mode is most common.
+
+---
+
+✅ Next Practical: `34_streaming_triggers_output_modes.md`
