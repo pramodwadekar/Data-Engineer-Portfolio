@@ -1,0 +1,173 @@
+# 20 - Handling Data Skew (PySpark Practical)
+
+This practical covers:
+- what is skew
+- symptoms
+- broadcast join
+- repartition by key
+- salting technique (core)
+- AQE skew join basics
+- how to identify skew using groupBy
+
+Skew handling is asked in advanced interviews.
+
+---
+
+## 0) Setup
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, lit, rand, floor, concat_ws, count
+from pyspark.sql.functions import broadcast
+
+spark = SparkSession.builder     .appName("DataSkewHandlingPractical")     .master("local[*]")     .getOrCreate()
+```
+
+---
+
+## 1) Create Skewed Data
+
+Here 80% rows belong to key=1.
+
+```python
+skew_data = []
+
+for i in range(1, 100001):
+    if i <= 80000:
+        skew_data.append((1, i * 10))
+    else:
+        skew_data.append((i, i * 10))
+
+df = spark.createDataFrame(skew_data, ["key", "value"])
+df.show(5)
+```
+
+---
+
+## 2) Identify Skew (Most Important)
+
+Check key distribution:
+
+```python
+df.groupBy("key").count().orderBy(col("count").desc()).show(10)
+```
+
+If one key has huge count → skew.
+
+---
+
+## 3) Why Skew is Problem?
+If you do join/groupBy on skewed key:
+- one partition becomes huge
+- one task becomes slow
+- job runtime increases
+
+---
+
+## 4) Fix 1: Broadcast Join (If other table is small)
+
+Create small lookup:
+
+```python
+lookup = spark.createDataFrame([(1, "VIP"), (2, "Normal")], ["key", "category"])
+```
+
+Broadcast join:
+
+```python
+joined = df.join(broadcast(lookup), "key", "left")
+joined.show(5)
+```
+
+---
+
+## 5) Fix 2: Repartition by Key (May help sometimes)
+
+```python
+df_rep = df.repartition(20, "key")
+df_rep.rdd.getNumPartitions()
+```
+
+⚠️ If key is skewed, repartition alone cannot fully solve.
+
+---
+
+## 6) Fix 3: Salting Technique (Most Important)
+
+### 6.1 Add random salt for skewed key
+We will add salt values 0-9.
+
+```python
+df_salt = df.withColumn("salt", floor(rand() * 10))
+df_salt.show(5)
+```
+
+Create salted_key:
+
+```python
+df_salt = df_salt.withColumn("salted_key", concat_ws("_", col("key"), col("salt")))
+df_salt.show(5)
+```
+
+---
+
+### 6.2 Expand lookup table for all salts
+We need to create 10 rows for key=1 with all salts.
+
+```python
+salts = spark.range(0, 10).withColumnRenamed("id", "salt")
+
+lookup_expanded = lookup.crossJoin(salts)     .withColumn("salted_key", concat_ws("_", col("key"), col("salt")))
+```
+
+---
+
+### 6.3 Join using salted_key
+Now join is distributed.
+
+```python
+final_df = df_salt.join(
+    broadcast(lookup_expanded),
+    on="salted_key",
+    how="left"
+)
+
+final_df.select("key", "value", "category").show(5)
+```
+
+---
+
+## 7) Fix 4: AQE Skew Join Handling
+
+Enable AQE:
+
+```python
+spark.conf.set("spark.sql.adaptive.enabled", "true")
+spark.conf.set("spark.sql.adaptive.skewJoin.enabled", "true")
+```
+
+Now Spark can split skew partitions automatically during join.
+
+---
+
+## 8) Best Practices
+
+✅ Detect skew using groupBy().count()  
+✅ Use Spark UI to check long tasks  
+✅ Broadcast small tables  
+✅ Use salting for highly skewed keys  
+✅ Enable AQE skew join in Spark 3+  
+
+---
+
+## 9) Summary
+
+- Skew happens when one key has huge data.
+- Symptoms: one task slow, spill, OOM.
+- Broadcast join avoids shuffle.
+- Salting splits heavy key into multiple keys.
+- AQE can handle skew automatically.
+
+---
+
+✅ Next Practical: `21_aqe_practical.md`
