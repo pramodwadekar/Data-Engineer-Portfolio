@@ -1,0 +1,100 @@
+# 41 - Databricks Auto Loader (cloudFiles) Practical (Advanced)
+
+This practical covers:
+- What is Auto Loader
+- cloudFiles format
+- schemaLocation
+- checkpointing
+- incremental file ingestion
+- streaming into Delta
+- best practices
+
+Auto Loader is widely used in Databricks pipelines.
+
+---
+
+## 1) What is Auto Loader?
+
+Auto Loader is a Databricks feature to ingest files incrementally from:
+- ADLS
+- S3
+- GCS
+- DBFS
+
+It is better than normal readStream for large scale ingestion.
+
+---
+
+## 2) Auto Loader Example (JSON)
+
+```python
+input_path = "/mnt/raw/events_json"
+checkpoint_path = "/mnt/checkpoints/autoloader/events"
+schema_location = "/mnt/schema/autoloader/events"
+delta_path = "/mnt/delta/bronze/events"
+```
+
+---
+
+## 3) Read using cloudFiles
+
+```python
+from pyspark.sql.types import StructType, StructField, IntegerType, StringType, TimestampType
+
+schema = StructType([
+    StructField("event_id", IntegerType(), True),
+    StructField("user_id", IntegerType(), True),
+    StructField("event_type", StringType(), True),
+    StructField("event_time", TimestampType(), True)
+])
+
+df = spark.readStream     .format("cloudFiles")     .option("cloudFiles.format", "json")     .option("cloudFiles.schemaLocation", schema_location)     .schema(schema)     .load(input_path)
+```
+
+---
+
+## 4) Write to Delta Bronze
+
+```python
+query = df.writeStream     .format("delta")     .outputMode("append")     .option("checkpointLocation", checkpoint_path)     .start(delta_path)
+```
+
+---
+
+## 5) Why schemaLocation?
+
+Auto Loader stores schema metadata at schemaLocation.
+This helps:
+- schema inference tracking
+- schema evolution
+
+---
+
+## 6) Auto Loader with CSV
+
+```python
+df_csv = spark.readStream     .format("cloudFiles")     .option("cloudFiles.format", "csv")     .option("header", "true")     .option("cloudFiles.schemaLocation", "/mnt/schema/autoloader/csv")     .load("/mnt/raw/csv_data")
+```
+
+---
+
+## 7) Best Practices
+
+✅ Always use schemaLocation  
+✅ Always use checkpointing  
+✅ Use Auto Loader for cloud ingestion  
+✅ Use bronze-silver-gold with Auto Loader  
+✅ Handle bad records using quarantine  
+
+---
+
+## 8) Summary
+
+- Auto Loader is Databricks feature.
+- It ingests new files incrementally.
+- Uses schemaLocation + checkpointing.
+- Writes to Delta for reliable pipelines.
+
+---
+
+🎉 Now your PySpark Practicals are **industry-level complete**.
