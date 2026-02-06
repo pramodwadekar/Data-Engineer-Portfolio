@@ -1,0 +1,246 @@
+# 13 - Complex Data Types (Array, Map, Struct) (PySpark Practical)
+
+This practical covers:
+- ArrayType
+- MapType
+- StructType nested
+- explode(), explode_outer()
+- posexplode()
+- getItem()
+- JSON flattening techniques
+- nested JSON flattening
+
+Complex datatypes are very common in real projects (API data).
+
+---
+
+## 0) Setup
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import (
+    col, explode, explode_outer, posexplode,
+    split, array_contains
+)
+from pyspark.sql.types import StructType, StructField, StringType, IntegerType, ArrayType, MapType
+
+spark = SparkSession.builder     .appName("ComplexDataTypesPractical")     .master("local[*]")     .getOrCreate()
+```
+
+---
+
+## 1) ArrayType Practical
+
+### 1.1 Create DataFrame with array
+
+```python
+data = [
+    (1, "Pramod", ["Python", "SQL", "PySpark"]),
+    (2, "Akash", ["Excel", "HR"]),
+    (3, "Rahul", None)
+]
+
+schema = StructType([
+    StructField("id", IntegerType(), True),
+    StructField("name", StringType(), True),
+    StructField("skills", ArrayType(StringType()), True)
+])
+
+df = spark.createDataFrame(data, schema)
+df.show(truncate=False)
+df.printSchema()
+```
+
+---
+
+### 1.2 explode() (Most Used)
+
+```python
+df_explode = df.select("id", "name", explode("skills").alias("skill"))
+df_explode.show(truncate=False)
+```
+
+⚠️ explode() removes rows where array is null.
+
+---
+
+### 1.3 explode_outer()
+
+```python
+df_explode_outer = df.select("id", "name", explode_outer("skills").alias("skill"))
+df_explode_outer.show(truncate=False)
+```
+
+explode_outer keeps null rows.
+
+---
+
+### 1.4 array_contains()
+
+```python
+df.filter(array_contains(col("skills"), "SQL")).show(truncate=False)
+```
+
+---
+
+## 2) posexplode()
+
+posexplode gives:
+- position index
+- value
+
+```python
+df_pos = df.select("id", "name", posexplode("skills").alias("pos", "skill"))
+df_pos.show(truncate=False)
+```
+
+---
+
+## 3) MapType Practical
+
+### 3.1 Create MapType column
+
+```python
+data2 = [
+    (1, {"city": "Pune", "state": "MH"}),
+    (2, {"city": "Mumbai", "state": "MH"}),
+    (3, None)
+]
+
+schema2 = StructType([
+    StructField("id", IntegerType(), True),
+    StructField("address", MapType(StringType(), StringType()), True)
+])
+
+df_map = spark.createDataFrame(data2, schema2)
+df_map.show(truncate=False)
+df_map.printSchema()
+```
+
+---
+
+### 3.2 getItem() for Map
+
+```python
+df_map.select(
+    col("id"),
+    col("address").getItem("city").alias("city"),
+    col("address").getItem("state").alias("state")
+).show(truncate=False)
+```
+
+---
+
+## 4) StructType Nested Practical
+
+### 4.1 Create nested struct
+
+```python
+data3 = [
+    (1, ("Pramod", 24)),
+    (2, ("Akash", 25)),
+    (3, ("Rahul", None))
+]
+
+schema3 = StructType([
+    StructField("id", IntegerType(), True),
+    StructField("person", StructType([
+        StructField("name", StringType(), True),
+        StructField("age", IntegerType(), True)
+    ]), True)
+])
+
+df_struct = spark.createDataFrame(data3, schema3)
+df_struct.show(truncate=False)
+df_struct.printSchema()
+```
+
+---
+
+### 4.2 Access struct fields
+
+```python
+df_struct.select(
+    col("id"),
+    col("person.name").alias("name"),
+    col("person.age").alias("age")
+).show(truncate=False)
+```
+
+---
+
+## 5) JSON Flattening (Most Important)
+
+### 5.1 Example JSON string (nested)
+In real work, JSON comes from:
+- API
+- Kafka
+- files
+
+Example JSON:
+
+```python
+json_data = [
+    ('{"id":1,"name":"Pramod","address":{"city":"Pune","pin":411001},"skills":["Python","SQL"]}',),
+    ('{"id":2,"name":"Akash","address":{"city":"Mumbai","pin":400001},"skills":["Excel"]}',)
+]
+
+df_json = spark.createDataFrame(json_data, ["raw_json"])
+df_json.show(truncate=False)
+```
+
+---
+
+### 5.2 Parse JSON using from_json()
+
+```python
+from pyspark.sql.functions import from_json
+from pyspark.sql.types import StructType, StructField, StringType, IntegerType, ArrayType
+
+json_schema = StructType([
+    StructField("id", IntegerType(), True),
+    StructField("name", StringType(), True),
+    StructField("address", StructType([
+        StructField("city", StringType(), True),
+        StructField("pin", IntegerType(), True)
+    ]), True),
+    StructField("skills", ArrayType(StringType()), True)
+])
+
+df_parsed = df_json.withColumn("json", from_json(col("raw_json"), json_schema))
+df_parsed.show(truncate=False)
+df_parsed.printSchema()
+```
+
+---
+
+### 5.3 Flatten Struct + Explode Array
+
+```python
+df_flat = df_parsed.select(
+    col("json.id").alias("id"),
+    col("json.name").alias("name"),
+    col("json.address.city").alias("city"),
+    col("json.address.pin").alias("pin"),
+    explode(col("json.skills")).alias("skill")
+)
+
+df_flat.show(truncate=False)
+```
+
+---
+
+## 6) Summary
+
+- ArrayType is common for lists.
+- explode() converts array elements into rows.
+- explode_outer keeps null arrays.
+- posexplode gives index + value.
+- MapType is key-value structure.
+- getItem extracts map values.
+- StructType is nested object.
+- JSON flattening uses from_json + select + explode.
+
+---
+
+✅ Next Practical: `14_udf_vs_builtin_practical.md`
