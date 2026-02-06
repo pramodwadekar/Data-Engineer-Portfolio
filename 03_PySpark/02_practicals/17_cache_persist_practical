@@ -1,0 +1,107 @@
+# 17 - cache(), persist(), unpersist() (PySpark Practical)
+
+This practical covers:
+- cache()
+- persist()
+- unpersist()
+- when to use caching
+- memory vs disk
+- persist levels
+
+Caching is one of the best ways to speed up pipelines.
+
+---
+
+## 0) Setup
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col
+from pyspark import StorageLevel
+
+spark = SparkSession.builder     .appName("CachePersistPractical")     .master("local[*]")     .getOrCreate()
+
+data = [(i, "IT" if i % 2 == 0 else "HR", i * 1000) for i in range(1, 50001)]
+df = spark.createDataFrame(data, ["id", "dept", "salary"])
+```
+
+---
+
+## 1) Without Cache (Recomputation)
+
+```python
+df_it = df.filter(col("dept") == "IT")
+
+df_it.count()
+df_it.groupBy("dept").avg("salary").show()
+```
+
+Spark recomputes df_it twice.
+
+---
+
+## 2) cache()
+
+```python
+df_it_cached = df.filter(col("dept") == "IT").cache()
+
+df_it_cached.count()   # triggers cache
+df_it_cached.groupBy("dept").avg("salary").show()  # faster
+```
+
+---
+
+## 3) persist()
+
+```python
+df_hr = df.filter(col("dept") == "HR").persist(StorageLevel.MEMORY_ONLY)
+
+df_hr.count()
+df_hr.groupBy("dept").max("salary").show()
+```
+
+---
+
+## 4) Persist Levels
+
+Common levels:
+- MEMORY_ONLY (fastest)
+- MEMORY_AND_DISK (default cache)
+- DISK_ONLY (slow but safe)
+
+---
+
+## 5) unpersist()
+
+Always unpersist after use:
+
+```python
+df_it_cached.unpersist()
+df_hr.unpersist()
+```
+
+---
+
+## 6) When to Use Caching?
+
+Use caching when:
+✅ DataFrame reused multiple times  
+✅ Multiple actions on same transformed DF  
+✅ Same DF used in multiple joins  
+
+Do not cache when:
+❌ DF used only once  
+❌ DF is huge and cannot fit memory  
+
+---
+
+## 7) Summary
+
+- cache() is easy and uses MEMORY_AND_DISK.
+- persist() gives control.
+- unpersist() frees memory.
+- caching prevents recomputation and speeds up jobs.
+
+---
+
+
