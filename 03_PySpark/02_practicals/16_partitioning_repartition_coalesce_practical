@@ -1,0 +1,136 @@
+# 16 - Partitioning, Repartition, Coalesce (PySpark Practical)
+
+This practical covers:
+- What is partition?
+- repartition()
+- coalesce()
+- shuffle meaning
+- shuffle partitions
+- partitionBy while writing
+- best practices
+
+Partitioning is one of the most important performance topics.
+
+---
+
+## 0) Setup
+
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col
+
+spark = SparkSession.builder     .appName("PartitioningPractical")     .master("local[*]")     .getOrCreate()
+
+data = [(i, "IT" if i % 2 == 0 else "HR", i * 1000) for i in range(1, 51)]
+df = spark.createDataFrame(data, ["id", "dept", "salary"])
+df.show(5)
+```
+
+---
+
+## 1) Check Number of Partitions
+
+```python
+df.rdd.getNumPartitions()
+```
+
+---
+
+## 2) repartition()
+
+### 2.1 Increase partitions (causes shuffle)
+
+```python
+df_rep = df.repartition(10)
+df_rep.rdd.getNumPartitions()
+```
+
+---
+
+### 2.2 Repartition by column (useful before join/groupBy)
+
+```python
+df_rep_key = df.repartition(10, "dept")
+df_rep_key.rdd.getNumPartitions()
+```
+
+---
+
+## 3) coalesce()
+
+Reduce partitions (less shuffle):
+
+```python
+df_coal = df.coalesce(2)
+df_coal.rdd.getNumPartitions()
+```
+
+---
+
+## 4) Shuffle Meaning
+
+Shuffle happens in:
+- join
+- groupBy
+- distinct
+- orderBy
+- repartition
+
+Shuffle is expensive because Spark moves data across executors.
+
+---
+
+## 5) Shuffle Partitions
+
+Default:
+
+```python
+spark.conf.get("spark.sql.shuffle.partitions")
+```
+
+Change:
+
+```python
+spark.conf.set("spark.sql.shuffle.partitions", "20")
+```
+
+---
+
+## 6) partitionBy while Writing (Real DE Work)
+
+```python
+df.write.mode("overwrite")     .partitionBy("dept")     .parquet("output/partitioned_employees")
+```
+
+Output folder:
+
+```
+partitioned_employees/
+  dept=IT/
+  dept=HR/
+```
+
+---
+
+## 7) Best Practices
+
+✅ Use repartition before heavy joins/aggregations  
+✅ Use coalesce before writing to reduce small files  
+✅ Do not create too many partitions (overhead)  
+✅ Do not create too few partitions (low parallelism)  
+✅ Tune spark.sql.shuffle.partitions  
+✅ Partition output by frequently filtered columns  
+
+---
+
+## 8) Summary
+
+- Partition = chunk of data.
+- repartition causes shuffle.
+- coalesce reduces partitions with less shuffle.
+- shuffle is expensive.
+- partitionBy improves query performance.
+
+---
+
+✅ Next Practical: `17_cache_persist_practical.md`
