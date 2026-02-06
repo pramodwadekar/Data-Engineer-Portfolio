@@ -1,0 +1,142 @@
+# 40 - Data Quality Checks (Real DE Practical)
+
+This practical covers:
+- null checks
+- duplicate checks
+- count validation
+- schema validation
+- referential integrity check (basic)
+- data quality summary report
+
+This is a MUST for production pipelines.
+
+---
+
+## 0) Sample Data
+
+```python
+from pyspark.sql.functions import col, count, countDistinct
+
+data = [
+    (1, "Pramod", "IT", 50000),
+    (2, "Akash", "HR", None),
+    (2, "Akash", "HR", None),   # duplicate
+    (3, None, "IT", 45000),     # null name
+    (4, "Neha", None, 70000)    # null dept
+]
+
+df = spark.createDataFrame(data, ["id", "name", "dept", "salary"])
+df.show(truncate=False)
+```
+
+---
+
+## 1) Null Checks
+
+### 1.1 Count nulls per column
+
+```python
+from pyspark.sql.functions import sum, when
+
+null_report = df.select([
+    sum(when(col(c).isNull(), 1).otherwise(0)).alias(c + "_nulls")
+    for c in df.columns
+])
+
+null_report.show()
+```
+
+---
+
+## 2) Duplicate Checks
+
+### 2.1 Full row duplicates
+
+```python
+dup_count = df.count() - df.dropDuplicates().count()
+dup_count
+```
+
+### 2.2 Duplicate primary key (id)
+
+```python
+df.groupBy("id").count().filter(col("count") > 1).show()
+```
+
+---
+
+## 3) Count Validation (Source vs Target)
+
+Real pipeline:
+- read source count
+- write silver
+- read silver count
+- validate
+
+Example:
+
+```python
+source_count = df.count()
+source_count
+```
+
+---
+
+## 4) Schema Validation
+
+```python
+df.printSchema()
+```
+
+In production:
+- compare schema with expected StructType
+- fail pipeline if mismatch
+
+---
+
+## 5) Referential Integrity (Basic)
+
+Example:
+dept must exist in department table.
+
+```python
+dept_df = spark.createDataFrame([( "IT",), ("HR",), ("Finance",)], ["dept"])
+
+invalid_dept = df.join(dept_df, "dept", "left_anti")
+invalid_dept.show()
+```
+
+---
+
+## 6) Data Quality Summary (Mini Report)
+
+```python
+total = df.count()
+unique_ids = df.select("id").distinct().count()
+
+print("Total rows:", total)
+print("Unique ids:", unique_ids)
+print("Duplicate rows:", total - df.dropDuplicates().count())
+```
+
+---
+
+## 7) Best Practices
+
+✅ Always run null + duplicate checks  
+✅ Keep DQ logs in a separate Delta table  
+✅ Fail pipeline if critical checks fail  
+✅ Track DQ metrics daily  
+✅ Use Great Expectations in enterprise (optional)  
+
+---
+
+## 8) Summary
+
+- Data quality checks are mandatory.
+- Null checks + duplicates are common.
+- Referential integrity ensures correct dimension mapping.
+
+---
+
+✅ Next Practical: `41_databricks_autoloader_cloudfiles.md`
