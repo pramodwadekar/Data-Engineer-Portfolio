@@ -1,0 +1,5 @@
+{
+  "name": "pl_child_incremental_copy",
+  "type": "Pipeline",
+  "description": "Child pipeline: read watermark -> incremental copy -> update watermark -> audit logging"
+}

@@ -1,0 +1,5 @@
+{
+  "name": "pl_event_ingestion_quarantine",
+  "type": "Pipeline",
+  "description": "Triggered on blob created -> validate -> copy -> quarantine on failure"
+}

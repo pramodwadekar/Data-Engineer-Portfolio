@@ -1,0 +1,5 @@
+{
+  "name": "pl_parent_metadata_driver",
+  "type": "Pipeline",
+  "description": "Parent pipeline: Lookup config -> ForEach -> Execute child pipeline"
+}

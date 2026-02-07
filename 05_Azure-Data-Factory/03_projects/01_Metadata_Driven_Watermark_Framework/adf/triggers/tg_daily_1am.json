@@ -1,0 +1,5 @@
+{
+  "name": "tg_daily_1am",
+  "type": "ScheduleTrigger",
+  "schedule": "0 0 1 * * *"
+}

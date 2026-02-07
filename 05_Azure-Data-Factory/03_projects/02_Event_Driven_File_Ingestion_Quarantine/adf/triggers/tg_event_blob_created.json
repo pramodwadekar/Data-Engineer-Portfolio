@@ -1,0 +1,5 @@
+{
+  "name": "tg_event_blob_created",
+  "type": "EventTrigger",
+  "event": "BlobCreated"
+}

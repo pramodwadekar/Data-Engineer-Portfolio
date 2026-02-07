@@ -1,0 +1,1 @@
+-- Create source tables (orders, customers) in Azure SQL

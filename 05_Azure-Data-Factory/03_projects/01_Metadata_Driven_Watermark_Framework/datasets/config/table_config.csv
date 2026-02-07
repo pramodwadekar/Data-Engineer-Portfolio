@@ -1,0 +1,3 @@
+table_name,watermark_column,is_active,target_folder
+orders,updated_at,1,bronze/orders
+customers,created_at,1,bronze/customers

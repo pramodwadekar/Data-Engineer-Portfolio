@@ -1,0 +1,2 @@
+- Required columns: sale_id, store_id, amount, sale_date
+- amount must be > 0

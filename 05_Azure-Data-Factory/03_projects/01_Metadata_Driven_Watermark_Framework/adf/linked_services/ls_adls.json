@@ -1,0 +1,5 @@
+{
+  "name": "ls_adls",
+  "type": "AzureDataLakeStorageGen2",
+  "auth": "ManagedIdentity"
+}

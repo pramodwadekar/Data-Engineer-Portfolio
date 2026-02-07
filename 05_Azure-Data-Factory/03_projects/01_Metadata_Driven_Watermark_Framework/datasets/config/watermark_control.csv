@@ -1,0 +1,3 @@
+table_name,last_watermark
+orders,2025-12-31
+customers,2025-12-31
