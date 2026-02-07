@@ -25,7 +25,4 @@ Each project contains:
 
 ---
 
-## Interview Tip
-Pick **Project 2 (DLT)** as your main story.
-Use **Project 1** for governance/security questions.
-Use **Project 3** for SQL warehouse + BI discussion.
+
