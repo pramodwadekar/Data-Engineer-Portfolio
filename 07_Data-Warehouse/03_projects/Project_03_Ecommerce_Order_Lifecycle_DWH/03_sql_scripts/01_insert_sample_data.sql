@@ -1,0 +1,32 @@
+-- Sample data
+
+INSERT INTO stg_customers VALUES
+(2001,'Kunal Deshmukh','Pune','MH','2024-01-01 00:00:00'),
+(2002,'Priya Nair','Mumbai','MH','2024-01-01 00:00:00');
+
+INSERT INTO stg_products VALUES
+(3001,'Boat Headphones','Electronics','2024-01-01 00:00:00'),
+(3002,'Nike Shoes','Footwear','2024-01-01 00:00:00');
+
+INSERT INTO stg_delivery_partners VALUES
+(4001,'Delhivery','2024-01-01 00:00:00'),
+(4002,'BlueDart','2024-01-01 00:00:00');
+
+INSERT INTO stg_orders VALUES
+(5001,2001,'2024-01-05','CREATED',2500.00,'2024-01-05 09:00:00'),
+(5002,2002,'2024-01-06','CREATED',4500.00,'2024-01-06 10:00:00');
+
+INSERT INTO stg_order_items VALUES
+(5001,3001,1,2500.00,'2024-01-05 09:00:00'),
+(5002,3002,1,4500.00,'2024-01-06 10:00:00');
+
+INSERT INTO stg_payments VALUES
+(5001,'2024-01-05','SUCCESS','2024-01-05 10:00:00'),
+(5002,'2024-01-06','SUCCESS','2024-01-06 11:00:00');
+
+INSERT INTO stg_shipments VALUES
+(5001,'2024-01-05','2024-01-06','2024-01-08',4001,'2024-01-08 20:00:00'),
+(5002,'2024-01-06','2024-01-07','2024-01-09',4002,'2024-01-09 20:00:00');
+
+INSERT INTO stg_returns VALUES
+(5002,'2024-01-12','Size issue','2024-01-12 12:00:00');
