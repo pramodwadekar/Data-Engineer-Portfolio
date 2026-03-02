@@ -1,7 +1,7 @@
 # 00 - PySpark Introduction (Apache Spark Basics)
 
 ## 1) What is Apache Spark?
-**Apache Spark** is an **open-source distributed data processing framework** used to process **large-scale data** efficiently.
+**Apache Spark** is an **open-source distributed data processing engine** used to process **large-scale data** efficiently.
 
 It is designed for:
 - **Big Data processing**
