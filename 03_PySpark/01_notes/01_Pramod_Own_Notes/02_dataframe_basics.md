@@ -49,7 +49,7 @@ To create DataFrames, you need SparkSession:
 ```python
 from pyspark.sql import SparkSession
 
-spark = SparkSession.builder     .appName("DataFrameBasics")     .getOrCreate()
+spark = SparkSession.builder.appName("DataFrameBasics").getOrCreate()
 ```
 
 ---
@@ -106,8 +106,7 @@ df.show()
 ### 3.4 Create DataFrame from File (CSV Example)
 
 ```python
-df = spark.read     .option("header", "true")     .option("inferSchema", "true")     .csv("data/employees.csv")
-
+df = spark.read.option("header", "true").option("inferSchema", "true").csv("data/employees.csv")
 df.show()
 ```
 
@@ -279,8 +278,7 @@ df2.show()
 ### 9.2 Rename Multiple Columns (Best Method)
 
 ```python
-df2 = df     .withColumnRenamed("name", "employee_name")     .withColumnRenamed("age", "employee_age")
-
+df2 = df.withColumnRenamed("name", "employee_name").withColumnRenamed("age", "employee_age")
 df2.show()
 ```
 
