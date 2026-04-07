@@ -167,8 +167,7 @@ df2.show(truncate=False)
 ```python
 from pyspark.sql.functions import lower, upper
 
-df2 = df     .withColumn("name_lower", lower(trim(col("name"))))     .withColumn("dept_upper", upper(col("dept")))
-
+df2 = df.withColumn("name_lower", lower(trim(col("name")))).withColumn("dept_upper", upper(col("dept")))
 df2.show(truncate=False)
 ```
 
