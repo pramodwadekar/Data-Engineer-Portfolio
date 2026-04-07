@@ -62,7 +62,7 @@ schema = StructType([
     StructField("department", StringType(), True)
 ])
 
-df = spark.read     .option("header", "true")     .schema(schema)     .csv("data/employees.csv")
+df = spark.read.option("header", "true").schema(schema).csv("data/employees.csv")
 
 df.printSchema()
 ```
