@@ -27,7 +27,7 @@ In real projects, PySpark is mostly used for:
 General syntax:
 
 ```python
-df = spark.read     .format("csv")     .option("header", "true")     .load("path")
+df = spark.read.format("csv").option("header", "true").load("path")
 ```
 
 Or simplified:
@@ -43,8 +43,7 @@ df = spark.read.csv("path")
 ### 3.1 Read CSV (Basic)
 
 ```python
-df = spark.read     .option("header", "true")     .csv("data/employees.csv")
-
+df = spark.read.option("header", "true").csv("data/employees.csv")
 df.show()
 ```
 
@@ -53,8 +52,7 @@ df.show()
 ### 3.2 Read CSV with inferSchema
 
 ```python
-df = spark.read     .option("header", "true")     .option("inferSchema", "true")     .csv("data/employees.csv")
-
+df = spark.read.option("header", "true").option("inferSchema", "true").csv("data/employees.csv")
 df.printSchema()
 ```
 
@@ -67,7 +65,7 @@ df.printSchema()
 ### 3.3 Read CSV with delimiter
 
 ```python
-df = spark.read     .option("header", "true")     .option("sep", "|")     .csv("data/employees_pipe.csv")
+df = spark.read.option("header", "true").option("sep", "|").csv("data/employees_pipe.csv")
 ```
 
 ---
@@ -75,7 +73,7 @@ df = spark.read     .option("header", "true")     .option("sep", "|")     .csv("
 ### 3.4 Write CSV (Basic)
 
 ```python
-df.write     .mode("overwrite")     .option("header", "true")     .csv("output/employees_csv")
+df.write.mode("overwrite").option("header", "true").csv("output/employees_csv")
 ```
 
 ⚠️ Spark writes CSV as a **folder** with multiple part files.
@@ -99,7 +97,7 @@ df.printSchema()
 If your JSON is in multiline format:
 
 ```python
-df = spark.read     .option("multiline", "true")     .json("data/employees_multiline.json")
+df = spark.read.option("multiline", "true").json("data/employees_multiline.json")
 ```
 
 ---
@@ -107,7 +105,7 @@ df = spark.read     .option("multiline", "true")     .json("data/employees_multi
 ### 4.3 Write JSON
 
 ```python
-df.write     .mode("overwrite")     .json("output/employees_json")
+df.write.mode("overwrite").json("output/employees_json")
 ```
 
 ---
@@ -137,7 +135,7 @@ df.show()
 ### 5.3 Write Parquet
 
 ```python
-df.write     .mode("overwrite")     .parquet("output/employees_parquet")
+df.write.mode("overwrite").parquet("output/employees_parquet")
 ```
 
 ---
@@ -169,7 +167,7 @@ df.show()
 ### 6.3 Write Delta (Databricks)
 
 ```python
-df.write     .format("delta")     .mode("overwrite")     .save("/mnt/delta/employees")
+df.write.format("delta").mode("overwrite").save("/mnt/delta/employees")
 ```
 
 ---
@@ -223,7 +221,7 @@ Example:
 Partition by `department`
 
 ```python
-df.write     .mode("overwrite")     .partitionBy("department")     .parquet("output/employees_partitioned")
+df.write.mode("overwrite").partitionBy("department").parquet("output/employees_partitioned")
 ```
 
 Output structure:
@@ -243,7 +241,7 @@ Compression reduces storage and improves performance.
 ### 9.1 Parquet compression (snappy default)
 
 ```python
-df.write     .mode("overwrite")     .option("compression", "snappy")     .parquet("output/employees_parquet")
+df.write.mode("overwrite").option("compression", "snappy").parquet("output/employees_parquet")
 ```
 
 Other compression types:
@@ -257,7 +255,7 @@ Other compression types:
 ### 9.2 CSV compression
 
 ```python
-df.write     .mode("overwrite")     .option("header", "true")     .option("compression", "gzip")     .csv("output/employees_csv_gzip")
+df.write.mode("overwrite").option("header", "true").option("compression", "gzip").csv("output/employees_csv_gzip")
 ```
 
 ---
@@ -267,7 +265,7 @@ df.write     .mode("overwrite")     .option("header", "true")     .option("compr
 ### 10.1 Schema Inference (Easy but not recommended for big data)
 
 ```python
-df = spark.read     .option("header", "true")     .option("inferSchema", "true")     .csv("data/employees.csv")
+df = spark.read.option("header", "true").option("inferSchema", "true").csv("data/employees.csv")
 ```
 
 Problems:
@@ -288,8 +286,7 @@ schema = StructType([
     StructField("department", StringType(), True)
 ])
 
-df = spark.read     .option("header", "true")     .schema(schema)     .csv("data/employees.csv")
-
+df = spark.read.option("header", "true").schema(schema).csv("data/employees.csv")
 df.printSchema()
 ```
 
