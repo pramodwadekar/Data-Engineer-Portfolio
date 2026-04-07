@@ -33,8 +33,7 @@ Spark automatically detects datatypes from the data.
 Example:
 
 ```python
-df = spark.read     .option("header", "true")     .option("inferSchema", "true")     .csv("data/employees.csv")
-
+df = spark.read.option("header", "true").option("inferSchema", "true").csv("data/employees.csv")
 df.printSchema()
 ```
 
@@ -333,7 +332,7 @@ Modes:
 ### 9.2 Handle corrupt records in JSON
 
 ```python
-df = spark.read     .option("mode", "PERMISSIVE")     .option("columnNameOfCorruptRecord", "_corrupt_record")     .json("data/employees.json")
+df = spark.read.option("mode", "PERMISSIVE").option("columnNameOfCorruptRecord", "_corrupt_record").json("data/employees.json")
 ```
 
 ---
