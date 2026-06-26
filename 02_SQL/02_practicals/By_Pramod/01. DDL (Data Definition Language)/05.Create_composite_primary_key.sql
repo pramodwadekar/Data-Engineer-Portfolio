@@ -18,3 +18,15 @@ CREATE TABLE Student (
     Phone VARCHAR(15),
     PRIMARY KEY (Student_ID, Course_ID)
 );
+
+/*In this example:
+    Student_ID alone can have duplicates (if a student enrolls in multiple courses).
+    Course_ID alone can have duplicates (many students can take the same course).
+    But the combination (Student_ID, Course_ID) must be unique. 
+
+	| Student_ID | Course_ID | Student_Name |
+    | ---------- | --------- | ------------ |
+    | 101        | 1         | Pramod       |
+    | 101        | 2         | Pramod       |
+    | 102        | 1         | Rahul        |
+	This is valid because each (Student_ID, Course_ID) combination is unique. */
