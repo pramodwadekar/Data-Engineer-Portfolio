@@ -1,3 +1,6 @@
+/* Composite Primary Key: A composite primary key is a primary key made up of two or more columns. or A composite primary 
+key is a combination of two or more columns used to uniquely identify each record in a table.*/
+  
 CREATE TABLE Result (
   StudentId INTEGER,
   CourseId INTEGER,
