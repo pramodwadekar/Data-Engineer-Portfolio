@@ -24,6 +24,12 @@ FROM Weather;
 SELECT City, Country, CONCAT(CONCAT(City, ', '), Country) AS NestedConcat
 FROM Weather;
 
+-- OR
+
+SELECT City, Country,
+       CONCAT(City, ', ', Country) AS Concat
+FROM Weather;
+
 
 
 
