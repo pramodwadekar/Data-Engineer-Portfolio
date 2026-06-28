@@ -82,4 +82,29 @@ Amit → Department exists ❌
 Rahul → Department exists ❌
 Neha → No matching department ✅
 
+=======================================================================================================
+
+-- IN
+-- IN checks whether a value exists in a list or in the result of a subquery.
+
+SELECT EName
+FROM Employee
+WHERE DeptId IN (
+    SELECT DeptId
+    FROM Department
+);
+
+-- EName
+-- ------
+-- Amit
+-- Rahul
+
+-- Difference between IN And EXISTS
+-- | IN                           | EXISTS                                  |
+-- | ---------------------------- | --------------------------------------- |
+-- | Compares a value with a list | Checks whether a matching row exists    |
+-- | Best for small result sets   | Best for large result sets              |
+-- | Subquery executes first      | Checks row by row (correlated subquery) |
+-- | Can be slower for large data | Usually faster for large data           |
+
 
