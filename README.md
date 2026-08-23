@@ -12,7 +12,7 @@ The goal of this repo is to build **industry-ready Data Engineering skills** and
 
 ---
 
-## priority order:
+## Priority order:
 - **SQL** (analytics + Data Warehouse + optimization
 - **Python** (ETL, data handling, scripting)
 - **PySpark** (big data transformations)
@@ -23,7 +23,7 @@ The goal of this repo is to build **industry-ready Data Engineering skills** and
 - **Data Warehouse Concepts** (Star schema, SCD, OLTP vs OLAP)
 - **Git/GitHub**
 - **Azure Synapse** (DWH + serverless SQL concepts)
-- **Airflow**
+- **Apache Airflow**
 
 
 ## 🧰 Tech Stack Covered
