@@ -12,6 +12,20 @@ The goal of this repo is to build **industry-ready Data Engineering skills** and
 
 ---
 
+## priority order:
+- **SQL** (analytics + Data Warehouse + optimization
+- **Python** (ETL, data handling, scripting)
+- **PySpark** (big data transformations)
+- **Azure Basic**
+- **Azure Data Factory (ADF)** (orchestration & pipelines)
+- **Databricks** (Delta Lake, pipelines, SQL + Spark)
+- **Azure ADLS (Storage)** (cloud storage + partitioning)
+- **Data Warehouse Concepts** (Star schema, SCD, OLTP vs OLAP)
+- **Git/GitHub**
+- **Azure Synapse** (DWH + serverless SQL concepts)
+- **Airflow**
+
+
 ## 🧰 Tech Stack Covered
 - **Python** (ETL, data handling, scripting)
 - **SQL** (analytics + Data Warehouse + optimization)
